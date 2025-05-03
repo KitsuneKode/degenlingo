@@ -1,5 +1,11 @@
-import { ClerkProvider } from '@clerk/nextjs';
+import { ClerkProvider } from '@clerk/nextjs'
+import { Toaster } from 'sonner'
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
-  return <ClerkProvider afterSignOutUrl="/">{children}</ClerkProvider>;
-};
+  return (
+    <ClerkProvider afterSignOutUrl="/">
+      <Toaster />
+      {children}
+    </ClerkProvider>
+  )
+}

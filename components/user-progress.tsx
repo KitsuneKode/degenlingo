@@ -1,14 +1,15 @@
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import Image from 'next/image';
-import { InfinityIcon } from 'lucide-react';
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import Image from 'next/image'
+import { InfinityIcon } from 'lucide-react'
+import { courses, userProgress } from '@/db/schema'
 
 type Props = {
-  activeCourse: { title: string; imageSrc: string };
-  hearts: number;
-  points: number;
-  hasActiveSubscription: boolean;
-};
+  activeCourse: typeof courses.$inferSelect
+  hearts: number
+  points: number
+  hasActiveSubscription: boolean
+}
 
 export const UserProgress = ({
   activeCourse,
@@ -58,5 +59,5 @@ export const UserProgress = ({
         </Button>
       </Link>
     </div>
-  );
-};
+  )
+}

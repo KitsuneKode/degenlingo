@@ -1,10 +1,10 @@
-import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
+import { Button } from '@/components/ui/button'
+import { ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
 
 type Props = {
-  title: string;
-};
+  title: string
+}
 
 export const Header = ({ title }: Props) => {
   return (
@@ -20,5 +20,5 @@ export const Header = ({ title }: Props) => {
       <h1 className="text-lg font-bold ">{title}</h1>
       <div />
     </div>
-  );
-};
+  )
+}

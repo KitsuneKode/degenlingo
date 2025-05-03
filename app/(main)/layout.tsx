@@ -1,18 +1,18 @@
-import type { Metadata } from 'next';
-import '@/app/globals.css';
-import { Sidebar } from '@/components/sidebar';
-import { MobileHeader } from '@/components/mobile-header';
+import type { Metadata } from 'next'
+import '@/app/globals.css'
+import { Sidebar } from '@/components/sidebar'
+import { MobileHeader } from '@/components/mobile-header'
 
 export const metadata: Metadata = {
   title: 'DegenLingo',
   description:
     'DegenLingo - The best place to learn a new language with crypto',
-};
+}
 
 export default function MainLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <>
@@ -22,5 +22,5 @@ export default function MainLayout({
         <div className="max-w-[1056px] mx-auto pt-6 h-full">{children}</div>
       </main>
     </>
-  );
+  )
 }

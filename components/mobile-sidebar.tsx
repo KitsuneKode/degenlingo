@@ -4,9 +4,9 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from '@/components/ui/sheet';
-import { Menu } from 'lucide-react';
-import { Sidebar } from '@/components/sidebar';
+} from '@/components/ui/sheet'
+import { Menu } from 'lucide-react'
+import { Sidebar } from '@/components/sidebar'
 
 export const MobileSidebar = () => {
   return (
@@ -21,5 +21,5 @@ export const MobileSidebar = () => {
         <Sidebar />
       </SheetContent>
     </Sheet>
-  );
-};
+  )
+}

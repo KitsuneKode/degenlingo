@@ -1,20 +1,20 @@
-'use client';
+'use client'
 
-import { Button } from '@/components/ui/button';
-import Image from 'next/image';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { Button } from '@/components/ui/button'
+import Image from 'next/image'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 type Props = {
-  label: string;
-  iconScr: string;
-  href: string;
-};
+  label: string
+  iconScr: string
+  href: string
+}
 
 export const SidebarItem = ({ label, iconScr, href }: Props) => {
-  const pathname = usePathname();
+  const pathname = usePathname()
 
-  const active = pathname === href;
+  const active = pathname === href
   return (
     <Button
       variant={active ? 'sidebarOutline' : 'sidebar'}
@@ -33,5 +33,5 @@ export const SidebarItem = ({ label, iconScr, href }: Props) => {
         {label}
       </Link>
     </Button>
-  );
-};
+  )
+}

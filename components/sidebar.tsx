@@ -1,20 +1,20 @@
-import { cn } from '@/lib/utils';
-import Image from 'next/image';
-import Link from 'next/link';
-import { SidebarItem } from '@/components/sidebar-item';
-import { ClerkLoaded, ClerkLoading, UserButton } from '@clerk/nextjs';
-import { Loader } from 'lucide-react';
+import { cn } from '@/lib/utils'
+import Image from 'next/image'
+import Link from 'next/link'
+import { SidebarItem } from '@/components/sidebar-item'
+import { ClerkLoaded, ClerkLoading, UserButton } from '@clerk/nextjs'
+import { Loader } from 'lucide-react'
 
 type Props = {
-  className?: string;
-};
+  className?: string
+}
 
 export const Sidebar = ({ className }: Props) => {
   return (
     <div
       className={cn(
         'flex lg:w-[256px] h-full  lg:fixed left-0 top-0 lg:border-r-2 flex-col px-4',
-        className
+        className,
       )}
     >
       <Link href="/learn">
@@ -45,5 +45,5 @@ export const Sidebar = ({ className }: Props) => {
         </ClerkLoaded>
       </div>
     </div>
-  );
-};
+  )
+}

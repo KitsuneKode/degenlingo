@@ -1,18 +1,18 @@
-import type { Metadata } from 'next';
-import '@/app/globals.css';
-import { Header } from '@/app/(markerting)/header';
-import { Footer } from '@/app/(markerting)/footer';
+import type { Metadata } from 'next'
+import '@/app/globals.css'
+import { Header } from '@/app/(markerting)/header'
+import { Footer } from '@/app/(markerting)/footer'
 
 export const metadata: Metadata = {
   title: 'DegenLingo',
   description:
     'DegenLingo - The best place to learn a new language with crypto',
-};
+}
 
 export default function MarketingLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <div className="min-h-screen flex flex-col">
@@ -22,5 +22,5 @@ export default function MarketingLayout({
       </main>
       <Footer />
     </div>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button'
 
 export default function Preview() {
   return (
@@ -16,5 +16,5 @@ export default function Preview() {
       <Button variant="sidebar">Sidebar</Button>
       <Button variant="sidebarOutline">Sidebar Outline</Button>
     </div>
-  );
+  )
 }
