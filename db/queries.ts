@@ -2,7 +2,13 @@ import { cache } from 'react'
 import db from './drizzle'
 import { auth } from '@clerk/nextjs/server'
 import { eq } from 'drizzle-orm'
-import { courses, units, userProgress } from './schema'
+import {
+  courses,
+  units,
+  userProgress,
+  challengeProgress,
+  lessons,
+} from './schema'
 
 export const getUserProgress = cache(async () => {
   const { userId } = await auth()
@@ -18,9 +24,10 @@ export const getUserProgress = cache(async () => {
 })
 
 export const getUnits = cache(async () => {
+  const { userId } = await auth()
   const userProgress = await getUserProgress()
 
-  if (!userProgress?.activeCourseId) return []
+  if (!userId || !userProgress?.activeCourseId) return []
 
   const data = await db.query.units.findMany({
     where: eq(units.courseId, userProgress.activeCourseId),
@@ -29,7 +36,9 @@ export const getUnits = cache(async () => {
         with: {
           challenges: {
             with: {
-              challengeProgress: true,
+              challengeProgress: {
+                where: eq(challengeProgress.userId, userId),
+              },
             },
           },
         },
@@ -49,7 +58,7 @@ export const getUnits = cache(async () => {
             challenge.challengeProgress.every((progress) => progress.completed)
           )
         },
-        true
+        false
       )
 
       return {
@@ -76,4 +85,108 @@ export const getCourseById = cache(async (courseId: number) => {
   })
 
   return data
+})
+
+export const getCourseProgress = cache(async () => {
+  const { userId } = await auth()
+  const userProgress = await getUserProgress()
+
+  if (!userId || !userProgress?.activeCourseId) return null
+
+  const unitsInActiveCourse = await db.query.units.findMany({
+    orderBy: (units, { asc }) => [asc(units.order)],
+    with: {
+      lessons: {
+        orderBy: (lessons, { asc }) => [asc(lessons.order)],
+        with: {
+          unit: true,
+          challenges: {
+            with: {
+              challengeProgress: {
+                where: eq(challengeProgress.userId, userId),
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+
+  const firstUncompletedLesson = unitsInActiveCourse
+    .flatMap((unit) => unit.lessons)
+    .find((lesson) => {
+      return lesson.challenges.some((challenge) => {
+        return (
+          !challenge.challengeProgress ||
+          challenge.challengeProgress.length === 0 ||
+          challenge.challengeProgress.every((progress) => !progress.completed) //TODO: check
+        )
+      })
+    })
+
+  return {
+    activeLesson: firstUncompletedLesson,
+    activeLessonId: firstUncompletedLesson?.id,
+  }
+})
+
+export const getLesson = cache(async (id?: number) => {
+  const { userId } = await auth()
+  if (!userId) return null
+  const courseProgress = await getCourseProgress()
+
+  const lessonId = id || courseProgress?.activeLessonId
+
+  if (!lessonId) return null
+
+  const data = await db.query.lessons.findFirst({
+    where: eq(lessons.id, lessonId),
+    with: {
+      challenges: {
+        orderBy: (challenges, { asc }) => [asc(challenges.order)],
+        with: {
+          challengeOptions: true,
+          challengeProgress: {
+            where: eq(challengeProgress.userId, userId),
+          },
+        },
+      },
+    },
+  })
+
+  if (!data || !data.challenges) return null
+
+  const normalizedData = data.challenges.map((challenge) => {
+    const completed =
+      challenge.challengeProgress &&
+      challenge.challengeProgress.length > 0 &&
+      challenge.challengeProgress.every((progress) => progress.completed)
+
+    return {
+      ...challenge,
+      completed,
+    }
+  })
+
+  return {
+    ...data,
+    challenges: normalizedData,
+  }
+})
+
+export const getLessonPercentage = cache(async () => {
+  const courseProgress = await getCourseProgress()
+
+  if (!courseProgress?.activeLessonId) return 0
+
+  const lesson = await getLesson(courseProgress.activeLessonId)
+
+  if (!lesson) return 0
+
+  const totalChallenges = lesson.challenges.length
+  const completedChallenges = lesson.challenges.filter(
+    (challenge) => challenge.completed
+  ).length
+
+  return Math.round((completedChallenges / totalChallenges) * 100)
 })

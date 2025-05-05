@@ -1,5 +1,4 @@
 'use server'
-
 import db from '@/db/drizzle'
 import { getCourseById, getUserProgress } from '@/db/queries'
 import { userProgress } from '@/db/schema'
@@ -19,6 +18,7 @@ export const upsertUserProgress = async (courseId: number) => {
 
   // if (!course.units.length || !course.units[0].lessons.length) throw new Error('Course is empty')
 
+  console.log(course)
   const existingUserProgress = await getUserProgress()
 
   if (existingUserProgress) {

@@ -5,7 +5,8 @@ import { courses, userProgress } from '@/db/schema'
 import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
 import { toast } from 'sonner'
-import { Card } from './card'
+import { Card } from '@/components/card'
+import { isRedirectError } from 'next/dist/client/components/redirect-error'
 
 type Props = {
   courses: (typeof courses.$inferSelect)[]
@@ -21,10 +22,14 @@ export const List = ({ courses, activeCourseId }: Props) => {
 
     if (id === activeCourseId) {
       router.push(`/learn/`)
+      return
     }
 
     startTransition(() => {
-      upsertUserProgress(id).catch(() => {
+      upsertUserProgress(id).catch((err) => {
+        if (isRedirectError(err)) {
+          return
+        }
         toast.error('Something went wrong')
       })
     })

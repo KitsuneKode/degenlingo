@@ -14,7 +14,7 @@ export const Sidebar = ({ className }: Props) => {
     <div
       className={cn(
         'flex lg:w-[256px] h-full  lg:fixed left-0 top-0 lg:border-r-2 flex-col px-4',
-        className,
+        className
       )}
     >
       <Link href="/learn">

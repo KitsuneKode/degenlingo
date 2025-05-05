@@ -14,7 +14,7 @@ const main = async () => {
 
     await db.delete(schema.courses)
     await db.delete(schema.userProgress)
-    await db.delete(schema.lesson)
+    await db.delete(schema.lessons)
     await db.delete(schema.challenges)
     await db.delete(schema.challengeOptions)
     await db.delete(schema.challengeProgress)
@@ -38,19 +38,67 @@ const main = async () => {
       },
     ])
 
-    await db.insert(schema.lesson).values([
+    await db.insert(schema.lessons).values([
       {
         id: 1,
         title: 'Nouns',
         unitId: 1,
         order: 1,
       },
-      // {
-      //   id: 2,
-      //   title: 'Adjectives',
-      //   unitId: 1,
-      //   order: 2,
-      // },
+      {
+        id: 2,
+        title: 'Adjectives',
+        unitId: 1,
+        order: 2,
+      },
+      {
+        id: 3,
+        title: 'Adjectives',
+        unitId: 1,
+        order: 2,
+      },
+      {
+        id: 4,
+        title: 'Adjectives',
+        unitId: 1,
+        order: 2,
+      },
+      {
+        id: 5,
+        title: 'Adjectives',
+        unitId: 1,
+        order: 2,
+      },
+      {
+        id: 6,
+        title: 'Nouns',
+        unitId: 1,
+        order: 1,
+      },
+      {
+        id: 7,
+        title: 'Adjectives',
+        unitId: 1,
+        order: 2,
+      },
+      {
+        id: 8,
+        title: 'Adjectives',
+        unitId: 1,
+        order: 2,
+      },
+      {
+        id: 9,
+        title: 'Adjectives',
+        unitId: 1,
+        order: 2,
+      },
+      {
+        id: 10,
+        title: 'Adjectives',
+        unitId: 1,
+        order: 2,
+      },
     ])
 
     await db.insert(schema.challenges).values([

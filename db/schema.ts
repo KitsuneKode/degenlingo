@@ -34,10 +34,10 @@ export const unitRelations = relations(units, ({ one, many }) => ({
     fields: [units.courseId],
     references: [courses.id],
   }),
-  lessons: many(lesson),
+  lessons: many(lessons),
 }))
 
-export const lesson = pgTable('lesson', {
+export const lessons = pgTable('lessons', {
   id: serial('id').primaryKey(),
   title: text('title').notNull(),
   unitId: integer('unit_id')
@@ -46,9 +46,9 @@ export const lesson = pgTable('lesson', {
   order: integer('order').notNull(),
 })
 
-export const lessonRelations = relations(lesson, ({ one, many }) => ({
+export const lessonRelations = relations(lessons, ({ one, many }) => ({
   unit: one(units, {
-    fields: [lesson.unitId],
+    fields: [lessons.unitId],
     references: [units.id],
   }),
   challenges: many(challenges),
@@ -59,7 +59,7 @@ export const challengesEnum = pgEnum('type', ['SELECT', 'ASSIST'])
 export const challenges = pgTable('challenges', {
   id: serial('id').primaryKey(),
   lessonId: integer('lesson_id')
-    .references(() => lesson.id, { onDelete: 'cascade' })
+    .references(() => lessons.id, { onDelete: 'cascade' })
     .notNull(),
   type: challengesEnum('type').notNull(),
   question: text('question').notNull(),
@@ -67,9 +67,9 @@ export const challenges = pgTable('challenges', {
 })
 
 export const challengeRelations = relations(challenges, ({ one, many }) => ({
-  lesson: one(lesson, {
+  lesson: one(lessons, {
     fields: [challenges.lessonId],
-    references: [lesson.id],
+    references: [lessons.id],
   }),
   challengeOptions: many(challengeOptions),
   challengeProgress: many(challengeProgress),
