@@ -1,7 +1,3 @@
-import { StickyWrapper } from '@/components/sticky-wrapper'
-import { FeedWrapper } from '@/components/feed-wrapper'
-import { Header } from './header'
-import { UserProgress } from '@/components/user-progress'
 import {
   getUnits,
   getUserProgress,
@@ -10,6 +6,10 @@ import {
 } from '@/db/queries'
 import { redirect } from 'next/navigation'
 import { Unit } from '@/components/unit'
+import { Header } from './header'
+import { FeedWrapper } from '@/components/feed-wrapper'
+import { StickyWrapper } from '@/components/sticky-wrapper'
+import { UserProgress } from '@/components/user-progress'
 
 export default async function LearnPage() {
   const userProgressData = getUserProgress()

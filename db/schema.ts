@@ -1,3 +1,4 @@
+import { MAX_HEARTS } from '@/lib/constants'
 import { relations } from 'drizzle-orm'
 import {
   integer,
@@ -121,7 +122,7 @@ export const userProgress = pgTable('user_progress', {
   activeCourseId: integer('active_course_id').references(() => courses.id, {
     onDelete: 'cascade',
   }),
-  hearts: integer('hearts').notNull().default(5),
+  hearts: integer('hearts').notNull().default(MAX_HEARTS),
   points: integer('points').notNull().default(0),
 })
 

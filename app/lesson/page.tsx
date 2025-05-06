@@ -1,8 +1,6 @@
 import { Quiz } from '@/components/quiz'
 import { getLesson, getUserProgress } from '@/db/queries'
 import { redirect } from 'next/navigation'
-import { Suspense } from 'react'
-import { Loader } from 'lucide-react'
 
 const LessonPage = async () => {
   const lessonData = getLesson()
@@ -24,15 +22,13 @@ const LessonPage = async () => {
 
   return (
     <>
-      <Suspense fallback={<Loader className="h-6 w-6 animate-spin" />}>
-        <Quiz
-          initialLessonId={lesson.id}
-          initialLessonChallenges={lesson.challenges}
-          initialHearts={userProgress.hearts}
-          initialPercentage={initialPercentage}
-          userSubscription={null}
-        />
-      </Suspense>
+      <Quiz
+        initialLessonId={lesson.id}
+        initialLessonChallenges={lesson.challenges}
+        initialHearts={userProgress.hearts}
+        initialPercentage={initialPercentage}
+        userSubscription={null}
+      />
     </>
   )
 }

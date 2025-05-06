@@ -49,16 +49,20 @@ export const getUnits = cache(async () => {
   const normalizedData = data.map((unit) => ({
     ...unit,
     lessons: unit.lessons.map((lesson) => {
-      const isCompleted = lesson.challenges.reduce(
-        (allCompleted, challenge) => {
-          if (!allCompleted) return false
-          return (
-            challenge.challengeProgress &&
-            challenge.challengeProgress.length > 0 &&
-            challenge.challengeProgress.every((progress) => progress.completed)
-          )
-        },
-        false
+      // If there are no challenges, the lesson is considered incomplete
+      if (!lesson.challenges.length) {
+        return {
+          ...lesson,
+          completed: false,
+        }
+      }
+
+      // Check if all challenges are completed
+      const isCompleted = lesson.challenges.every(
+        (challenge) =>
+          challenge.challengeProgress &&
+          challenge.challengeProgress.length > 0 &&
+          challenge.challengeProgress.every((progress) => progress.completed)
       )
 
       return {
@@ -118,8 +122,9 @@ export const getCourseProgress = cache(async () => {
       return lesson.challenges.some((challenge) => {
         return (
           !challenge.challengeProgress ||
-          challenge.challengeProgress.length === 0 ||
-          challenge.challengeProgress.every((progress) => !progress.completed) //TODO: check
+          challenge.challengeProgress.length === 0
+          // ||
+          // challenge.challengeProgress.every((progress) => !progress.completed)
         )
       })
     })
