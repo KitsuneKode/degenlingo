@@ -65,7 +65,7 @@ export const reduceHearts = async (challengeId: number) => {
   const existingChallengeProgress = await db.query.challengeProgress.findFirst({
     where: and(
       eq(challengeProgress.userId, userId),
-      eq(challengeProgress.challengeId, challengeId)
+      eq(challengeProgress.challengeId, challengeId),
     ),
   })
 
@@ -73,10 +73,6 @@ export const reduceHearts = async (challengeId: number) => {
 
   if (isPractice) {
     return { error: 'practice' }
-  }
-
-  if (currentUserProgress.hearts === 0) {
-    throw new Error('User progress not found')
   }
 
   //TODO subs

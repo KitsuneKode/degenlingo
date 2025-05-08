@@ -1,14 +1,14 @@
 import { cache } from 'react'
-import db from './drizzle'
-import { auth } from '@clerk/nextjs/server'
+import db from '@/db/drizzle'
 import { eq } from 'drizzle-orm'
+import { auth } from '@clerk/nextjs/server'
 import {
   courses,
   units,
   userProgress,
   challengeProgress,
   lessons,
-} from './schema'
+} from '@/db/schema'
 
 export const getUserProgress = cache(async () => {
   const { userId } = await auth()
@@ -62,7 +62,7 @@ export const getUnits = cache(async () => {
         (challenge) =>
           challenge.challengeProgress &&
           challenge.challengeProgress.length > 0 &&
-          challenge.challengeProgress.every((progress) => progress.completed)
+          challenge.challengeProgress.every((progress) => progress.completed),
       )
 
       return {
@@ -190,7 +190,7 @@ export const getLessonPercentage = cache(async () => {
 
   const totalChallenges = lesson.challenges.length
   const completedChallenges = lesson.challenges.filter(
-    (challenge) => challenge.completed
+    (challenge) => challenge.completed,
   ).length
 
   return Math.round((completedChallenges / totalChallenges) * 100)

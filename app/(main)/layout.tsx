@@ -1,5 +1,5 @@
-import type { Metadata } from 'next'
 import '@/app/globals.css'
+import type { Metadata } from 'next'
 import { Sidebar } from '@/components/sidebar'
 import { MobileHeader } from '@/components/mobile-header'
 
@@ -18,8 +18,8 @@ export default function MainLayout({
     <>
       <MobileHeader />
       <Sidebar className="hidden lg:flex" />
-      <main className="lg:pl-[256px] h-full pt-[50px] lg:p-0">
-        <div className="max-w-[1056px] mx-auto pt-6 h-full">{children}</div>
+      <main className="h-full pt-[50px] lg:p-0 lg:pl-[256px]">
+        <div className="mx-auto h-full max-w-[1056px] pt-6">{children}</div>
       </main>
     </>
   )

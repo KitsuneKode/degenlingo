@@ -1,7 +1,7 @@
-import type { Metadata } from 'next'
-import { DM_Mono, Exo_2 } from 'next/font/google'
 import './globals.css'
+import type { Metadata } from 'next'
 import { Providers } from '@/app/providers'
+import { DM_Mono, Exo_2 } from 'next/font/google'
 
 const exo2 = Exo_2({
   variable: '--font-exo-2',

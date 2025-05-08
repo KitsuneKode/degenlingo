@@ -1,7 +1,7 @@
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import { InfinityIcon } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { courses, userProgress } from '@/db/schema'
 
 type Props = {
@@ -18,7 +18,7 @@ export const UserProgress = ({
   hasActiveSubscription,
 }: Props) => {
   return (
-    <div className="flex items-center justify-between gap-x-2 w-full">
+    <div className="flex w-full items-center justify-between gap-x-2">
       <Link href="/courses">
         <Button variant="ghost">
           <Image

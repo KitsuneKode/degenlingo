@@ -1,5 +1,5 @@
-import { MAX_HEARTS } from '@/lib/constants'
 import { relations } from 'drizzle-orm'
+import { MAX_HEARTS } from '@/lib/constants'
 import {
   integer,
   pgEnum,
@@ -94,7 +94,7 @@ export const challengeOptionsRelations = relations(
       fields: [challengeOptions.challengeId],
       references: [challenges.id],
     }),
-  })
+  }),
 )
 export const challengeProgress = pgTable('challenge_progress', {
   id: serial('id').primaryKey(),
@@ -112,7 +112,7 @@ export const challengeProgressRelations = relations(
       fields: [challengeProgress.challengeId],
       references: [challenges.id],
     }),
-  })
+  }),
 )
 
 export const userProgress = pgTable('user_progress', {

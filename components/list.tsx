@@ -1,11 +1,12 @@
 'use client'
 
-import { upsertUserProgress } from '@/actions/user-progress'
-import { courses, userProgress } from '@/db/schema'
-import { useRouter } from 'next/navigation'
-import { useTransition } from 'react'
 import { toast } from 'sonner'
+import { useTransition } from 'react'
+import { courses } from '@/db/schema'
 import { Card } from '@/components/card'
+import { userProgress } from '@/db/schema'
+import { useRouter } from 'next/navigation'
+import { upsertUserProgress } from '@/actions/user-progress'
 import { isRedirectError } from 'next/dist/client/components/redirect-error'
 
 type Props = {
@@ -36,7 +37,7 @@ export const List = ({ courses, activeCourseId }: Props) => {
   }
 
   return (
-    <div className="pt-6 grid grid-cols-2 lg:grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-4">
+    <div className="grid grid-cols-2 gap-4 pt-6 lg:grid-cols-[repeat(auto-fill,minmax(210px,1fr))]">
       {courses.map((course) => (
         <Card
           key={course.id}

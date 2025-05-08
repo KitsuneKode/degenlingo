@@ -12,8 +12,8 @@ export default function MarketingLayout({
   children: React.ReactNode
 }>) {
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex flex-col h-full w-full">{children}</div>
+    <div className="flex h-full flex-col">
+      <div className="flex h-full w-full flex-col">{children}</div>
     </div>
   )
 }

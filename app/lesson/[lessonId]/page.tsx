@@ -2,8 +2,20 @@ import { Quiz } from '@/components/quiz'
 import { redirect } from 'next/navigation'
 import { getLesson, getUserProgress } from '@/db/queries'
 
-const LessonPage = async () => {
-  const lessonData = getLesson()
+type Props = {
+  params: {
+    lessonId: number
+  }
+}
+
+const LessonIdPage = async ({ params }: Props) => {
+  const lessonId = (await params).lessonId
+
+  if (!lessonId) {
+    redirect('/learn')
+  }
+
+  const lessonData = getLesson(lessonId)
   const userProgressData = getUserProgress()
 
   const [lesson, userProgress] = await Promise.all([
@@ -31,4 +43,4 @@ const LessonPage = async () => {
   )
 }
 
-export default LessonPage
+export default LessonIdPage

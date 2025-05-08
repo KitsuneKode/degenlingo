@@ -1,5 +1,5 @@
-import { getCourses, getUserProgress } from '@/db/queries'
 import { List } from '@/components/list'
+import { getCourses, getUserProgress } from '@/db/queries'
 
 const CoursesPage = async () => {
   const coursesData = getCourses()
@@ -11,7 +11,7 @@ const CoursesPage = async () => {
   ])
 
   return (
-    <div className="h-full maz-w-[912px] px-3 mx-auto">
+    <div className="maz-w-[912px] mx-auto h-full px-3">
       <h1 className="text-2xl font-bold text-neutral-700">Language Courses</h1>
       <List courses={courses} activeCourseId={userProgress?.activeCourseId} />
     </div>

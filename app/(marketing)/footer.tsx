@@ -1,10 +1,10 @@
-import { Button } from '@/components/ui/button'
 import Image from 'next/image'
+import { Button } from '@/components/ui/button'
 
 export const Footer = () => {
   return (
-    <footer className="hidden lg:block h-20 w-full border-t-2 border-slate-200 p-2 b">
-      <div className="max-w-screen-lg mx-auto flex items-center justify-evenly h-full">
+    <footer className="b hidden h-20 w-full border-t-2 border-slate-200 p-2 lg:block">
+      <div className="mx-auto flex h-full max-w-screen-lg items-center justify-evenly">
         <Button size="lg" variant="ghost">
           <Image
             src="/en.svg"

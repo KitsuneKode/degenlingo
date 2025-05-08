@@ -1,16 +1,16 @@
 'use server'
 
 import db from '@/db/drizzle'
-import { getUserProgress } from '@/db/queries'
-import { challengeProgress, challenges, userProgress } from '@/db/schema'
-import { MAX_HEARTS } from '@/lib/constants'
-import { auth } from '@clerk/nextjs/server'
 import { and, eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
+import { auth } from '@clerk/nextjs/server'
+import { MAX_HEARTS } from '@/lib/constants'
+import { getUserProgress } from '@/db/queries'
+import { challengeProgress, challenges, userProgress } from '@/db/schema'
 
 export const upsertChallengeProgress = async (
   challengeId: number,
-  optionId: number
+  optionId: number,
 ) => {
   const { userId } = await auth()
 
@@ -35,7 +35,7 @@ export const upsertChallengeProgress = async (
   const lessonId = challenge.lessonId
 
   const correctOption = challenge.challengeOptions.find(
-    (option) => option.correct
+    (option) => option.correct,
   )
 
   if (!correctOption || optionId !== correctOption.id)
@@ -44,7 +44,7 @@ export const upsertChallengeProgress = async (
   const existingChallengeProgress = await db.query.challengeProgress.findFirst({
     where: and(
       eq(challengeProgress.userId, userId),
-      eq(challengeProgress.challengeId, challengeId)
+      eq(challengeProgress.challengeId, challengeId),
     ),
   })
   const isPractice = !!existingChallengeProgress

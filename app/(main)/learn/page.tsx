@@ -1,15 +1,15 @@
+import { Header } from './header'
+import { Unit } from '@/components/unit'
+import { redirect } from 'next/navigation'
+import { FeedWrapper } from '@/components/feed-wrapper'
+import { UserProgress } from '@/components/user-progress'
+import { StickyWrapper } from '@/components/sticky-wrapper'
 import {
   getUnits,
   getUserProgress,
   getLessonPercentage,
   getCourseProgress,
 } from '@/db/queries'
-import { redirect } from 'next/navigation'
-import { Unit } from '@/components/unit'
-import { Header } from './header'
-import { FeedWrapper } from '@/components/feed-wrapper'
-import { StickyWrapper } from '@/components/sticky-wrapper'
-import { UserProgress } from '@/components/user-progress'
 
 export default async function LearnPage() {
   const userProgressData = getUserProgress()

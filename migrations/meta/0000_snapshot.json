@@ -86,12 +86,8 @@
           "name": "user_progress_active_course_id_courses_id_fk",
           "tableFrom": "user_progress",
           "tableTo": "courses",
-          "columnsFrom": [
-            "active_course_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["active_course_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
