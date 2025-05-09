@@ -1,5 +1,7 @@
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
+import { Promo } from '@/components/promo'
+import { QUESTS_DATA } from '@/lib/constants'
 import { Progress } from '@/components/ui/progress'
 import { FeedWrapper } from '@/components/feed-wrapper'
 import { UserProgress } from '@/components/user-progress'
@@ -14,33 +16,6 @@ export default async function LeaderboardPage() {
     userProgressData,
     userSubscriptionData,
   ])
-
-  const questsData = [
-    {
-      title: 'Earn 20 XP',
-      value: 20,
-    },
-    {
-      title: 'Earn 50 XP',
-      value: 50,
-    },
-    {
-      title: 'Earn 100 XP',
-      value: 100,
-    },
-    {
-      title: 'Earn 200 XP',
-      value: 200,
-    },
-    {
-      title: 'Earn 500 XP',
-      value: 500,
-    },
-    {
-      title: 'Earn 1000 XP',
-      value: 1000,
-    },
-  ]
 
   if (!userProgress || !userProgress.activeCourse) {
     redirect('/learn')
@@ -57,6 +32,7 @@ export default async function LeaderboardPage() {
           points={userProgress.points}
           hasActiveSubscription={isActiveSubscription}
         />
+        {!isActiveSubscription && <Promo />}
       </StickyWrapper>
       <FeedWrapper>
         <div className="flex w-full flex-col items-center">
@@ -68,12 +44,12 @@ export default async function LeaderboardPage() {
             Complete quests by earning points
           </p>
           <ul className="w-full">
-            {questsData.map((quest) => {
+            {QUESTS_DATA.map((quest) => {
               const progress = (userProgress.points / quest.value) * 100
 
               return (
                 <div
-                  className="flex w-full items-center gap-4 gap-x-4 border-t-2"
+                  className="flex w-full items-center gap-x-4 border-t-2 p-4"
                   key={quest.title}
                 >
                   <Image

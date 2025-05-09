@@ -1,5 +1,7 @@
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
+import { Promo } from '@/components/promo'
+import { Quests } from '@/components/quests'
 import { Separator } from '@/components/ui/separator'
 import { FeedWrapper } from '@/components/feed-wrapper'
 import { UserProgress } from '@/components/user-progress'
@@ -37,6 +39,8 @@ export default async function LeaderboardPage() {
           points={userProgress.points}
           hasActiveSubscription={isActiveSubscription}
         />
+        {!isActiveSubscription && <Promo />}
+        <Quests points={userProgress.points} />
       </StickyWrapper>
       <FeedWrapper>
         <div className="flex w-full flex-col items-center">

@@ -1,6 +1,8 @@
 import Image from 'next/image'
-import Items from '@/components/items'
 import { redirect } from 'next/navigation'
+import { Items } from '@/components/items'
+import { Promo } from '@/components/promo'
+import { Quests } from '@/components/quests'
 import { FeedWrapper } from '@/components/feed-wrapper'
 import { UserProgress } from '@/components/user-progress'
 import { StickyWrapper } from '@/components/sticky-wrapper'
@@ -30,6 +32,8 @@ export default async function ShopPage() {
           points={userProgress.points}
           hasActiveSubscription={isActiveSubscription}
         />
+        {!isActiveSubscription && <Promo />}
+        <Quests points={userProgress.points} />
       </StickyWrapper>
       <FeedWrapper>
         <div className="flex w-full flex-col items-center">

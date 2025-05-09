@@ -17,10 +17,8 @@ type Props = {
 }
 
 export const Unit = ({
-  id,
   title,
   description,
-  order,
   lessons,
   activeLesson,
   activeLessonPercentage,
@@ -29,7 +27,7 @@ export const Unit = ({
     <>
       <UnitBanner title={title} description={description} />
 
-      <div className="relative flex flex-col items-center">
+      <div className="relative mb-[48px] flex flex-col items-center">
         {lessons.map((lesson, index) => {
           const isCurrent = lesson.id === activeLesson?.id
           const isLocked = !lesson.completed && !isCurrent
