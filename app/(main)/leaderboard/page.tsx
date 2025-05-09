@@ -1,18 +1,25 @@
 import Image from 'next/image'
-import Items from '@/components/items'
 import { redirect } from 'next/navigation'
+import { Separator } from '@/components/ui/separator'
 import { FeedWrapper } from '@/components/feed-wrapper'
 import { UserProgress } from '@/components/user-progress'
 import { StickyWrapper } from '@/components/sticky-wrapper'
-import { getUserProgress, getUserSubscription } from '@/db/queries'
+import { Avatar, AvatarImage } from '@/components/ui/avatar'
+import {
+  getTopTenUsers,
+  getUserProgress,
+  getUserSubscription,
+} from '@/db/queries'
 
 export default async function LeaderboardPage() {
   const userProgressData = getUserProgress()
   const userSubscriptionData = getUserSubscription()
+  const leaderboardData = getTopTenUsers()
 
-  const [userProgress, userSubscription] = await Promise.all([
+  const [userProgress, userSubscription, leaderboard] = await Promise.all([
     userProgressData,
     userSubscriptionData,
+    leaderboardData,
   ])
 
   if (!userProgress || !userProgress.activeCourse) {
@@ -43,14 +50,28 @@ export default async function LeaderboardPage() {
             Leaderboard
           </h1>
           <p className="text-muted-foreground mb-6 text-center text-lg">
-            See how you compare to other learners
+            See how you compare to other learners in the community
           </p>
+          <Separator className="mb-4 h-0.5 rounded-full" />
 
-          <Items
-            hearts={userProgress.hearts}
-            points={userProgress.points}
-            hasActiveSubscription={isActiveSubscription}
-          />
+          {leaderboard.map((userProgress, index) => (
+            <div
+              key={userProgress.userId}
+              className="flex w-full items-center rounded-xl p-2 px-4 hover:bg-gray-200/50"
+            >
+              <p className="mr-4 font-bold text-lime-700">{index + 1}</p>
+              <Avatar className="mr-6 ml-3 h-12 w-12 border bg-green-500">
+                <AvatarImage
+                  className="object-cover"
+                  src={userProgress.userImageSrc}
+                />
+              </Avatar>
+              <p className="flex-1 font-bold text-neutral-800">
+                {userProgress.userName}
+              </p>
+              <p className="text-muted-foreground">{userProgress.points}XP</p>
+            </div>
+          ))}
         </div>
       </FeedWrapper>
     </div>
