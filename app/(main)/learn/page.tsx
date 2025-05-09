@@ -1,6 +1,7 @@
 import { Header } from './header'
 import { Unit } from '@/components/unit'
 import { redirect } from 'next/navigation'
+import { getUserSubscription } from '@/db/queries'
 import { FeedWrapper } from '@/components/feed-wrapper'
 import { UserProgress } from '@/components/user-progress'
 import { StickyWrapper } from '@/components/sticky-wrapper'
@@ -16,14 +17,21 @@ export default async function LearnPage() {
   const unitsData = getUnits()
   const courseProgressData = getCourseProgress()
   const lessonPercentageData = getLessonPercentage()
+  const userSubscriptionData = getUserSubscription()
 
-  const [userProgress, units, lessonPercentage, courseProgress] =
-    await Promise.all([
-      userProgressData,
-      unitsData,
-      lessonPercentageData,
-      courseProgressData,
-    ])
+  const [
+    userProgress,
+    units,
+    lessonPercentage,
+    courseProgress,
+    userSubscription,
+  ] = await Promise.all([
+    userProgressData,
+    unitsData,
+    lessonPercentageData,
+    courseProgressData,
+    userSubscriptionData,
+  ])
 
   if (!userProgress || !userProgress.activeCourse) {
     redirect('/courses')
@@ -40,7 +48,7 @@ export default async function LearnPage() {
           activeCourse={userProgress.activeCourse}
           hearts={userProgress.hearts}
           points={userProgress.points}
-          hasActiveSubscription={false}
+          hasActiveSubscription={!!userSubscription?.isActive}
         />
       </StickyWrapper>
       <FeedWrapper>

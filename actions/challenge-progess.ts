@@ -5,7 +5,7 @@ import { and, eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@clerk/nextjs/server'
 import { MAX_HEARTS } from '@/lib/constants'
-import { getUserProgress } from '@/db/queries'
+import { getUserProgress, getUserSubscription } from '@/db/queries'
 import { challengeProgress, challenges, userProgress } from '@/db/schema'
 
 export const upsertChallengeProgress = async (
@@ -17,8 +17,7 @@ export const upsertChallengeProgress = async (
   if (!userId) throw new Error('Unauthorized')
 
   const currentUserProgress = await getUserProgress()
-
-  //TODO:subscription check
+  const userSubscription = await getUserSubscription()
 
   if (!currentUserProgress?.activeCourseId)
     throw new Error('User progress not found')
@@ -49,7 +48,11 @@ export const upsertChallengeProgress = async (
   })
   const isPractice = !!existingChallengeProgress
 
-  if (currentUserProgress.hearts === 0 && !isPractice) {
+  if (
+    currentUserProgress.hearts === 0 &&
+    !isPractice &&
+    !userSubscription?.isActive
+  ) {
     return { error: 'hearts' }
   }
 

@@ -4,8 +4,13 @@ import { and, eq } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { auth, currentUser } from '@clerk/nextjs/server'
-import { getCourseById, getUserProgress } from '@/db/queries'
+import { HEARTS_REFILL_COST, MAX_HEARTS } from '@/lib/constants'
 import { userProgress, challengeProgress, challenges } from '@/db/schema'
+import {
+  getCourseById,
+  getUserProgress,
+  getUserSubscription,
+} from '@/db/queries'
 
 export const upsertUserProgress = async (courseId: number) => {
   const { userId } = await auth()
@@ -17,7 +22,8 @@ export const upsertUserProgress = async (courseId: number) => {
 
   if (!course) throw new Error('Course not found')
 
-  // if (!course.units.length || !course.units[0].lessons.length) throw new Error('Course is empty')
+  if (!course.units.length || !course.units[0].lessons.length)
+    throw new Error('Course is empty')
 
   const existingUserProgress = await getUserProgress()
 
@@ -51,6 +57,7 @@ export const reduceHearts = async (challengeId: number) => {
   if (!userId) throw new Error('Unauthorized')
 
   const currentUserProgress = await getUserProgress()
+  const userSubscription = await getUserSubscription()
 
   if (!currentUserProgress) throw new Error('User progress not found')
 
@@ -75,7 +82,9 @@ export const reduceHearts = async (challengeId: number) => {
     return { error: 'practice' }
   }
 
-  //TODO subs
+  if (userSubscription?.isActive) {
+    return { error: 'subscription' }
+  }
 
   if (currentUserProgress.hearts === 0) {
     return { error: 'hearts' }
@@ -94,4 +103,33 @@ export const reduceHearts = async (challengeId: number) => {
   revalidatePath('/quests')
   revalidatePath('/leaderboard')
   revalidatePath(`/lesson/${lessonId}`)
+}
+
+export const refillHearts = async () => {
+  const { userId } = await auth()
+
+  if (!userId) throw new Error('Unauthorized')
+
+  const currentUserProgress = await getUserProgress()
+
+  if (!currentUserProgress) throw new Error('User progress not found')
+
+  if (currentUserProgress.hearts === MAX_HEARTS)
+    throw new Error('Hearts are full')
+
+  if (currentUserProgress.points < HEARTS_REFILL_COST)
+    throw new Error('Not enough points')
+
+  await db
+    .update(userProgress)
+    .set({
+      hearts: MAX_HEARTS,
+      points: currentUserProgress.points - HEARTS_REFILL_COST,
+    })
+    .where(eq(userProgress.userId, userId))
+
+  revalidatePath('/shop')
+  revalidatePath('/learn')
+  revalidatePath('/quests')
+  revalidatePath('/leaderboard')
 }

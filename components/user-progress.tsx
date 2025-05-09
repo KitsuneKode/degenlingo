@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import { courses } from '@/db/schema'
 import { InfinityIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { courses, userProgress } from '@/db/schema'
 
 type Props = {
   activeCourse: typeof courses.$inferSelect

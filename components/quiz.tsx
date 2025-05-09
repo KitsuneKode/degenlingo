@@ -9,14 +9,15 @@ import { useRouter } from 'next/navigation'
 import { Footer } from '@/app/lesson/footer'
 import { useState, useTransition } from 'react'
 import { Challenge } from '@/components/challenge'
-import { useAudio, useWindowSize } from 'react-use'
 import { ResultCard } from '@/components/result-card'
 import { reduceHearts } from '@/actions/user-progress'
 import { useHeartModal } from '@/store/use-heart-modal'
-import { challengeOptions, challenges } from '@/db/schema'
+import { useAudio, useWindowSize, useMount } from 'react-use'
+import { usePracticeModal } from '@/store/use-practice-modal'
 import { QuestionBubble } from '@/components/question-bubble'
 import { MAX_HEARTS, POINTS_PER_CHALLENGE } from '@/lib/constants'
 import { upsertChallengeProgress } from '@/actions/challenge-progess'
+import { challengeOptions, challenges, userSubscription } from '@/db/schema'
 
 type Props = {
   initialLessonId: number
@@ -26,7 +27,11 @@ type Props = {
     completed: boolean
     challengeOptions: (typeof challengeOptions.$inferSelect)[]
   })[]
-  userSubscription: undefined | any //TODO: fix
+  userSubscription:
+    | (typeof userSubscription.$inferSelect & {
+        isActive: boolean
+      })
+    | null
 }
 
 export const Quiz = ({
@@ -39,9 +44,27 @@ export const Quiz = ({
   const router = useRouter()
   const { width, height } = useWindowSize()
   const { open: openHeartModal } = useHeartModal()
+  const { open: openPracticeModal } = usePracticeModal()
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [correctAudio, _c, correctControls] = useAudio({ src: '/correct.wav' })
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [incorrectAudio, _i, incorrectControls] = useAudio({
+    src: '/incorrect.wav',
+  })
+  const [finishAudio] = useAudio({ src: '/finish.mp3', autoPlay: true })
+
+  useMount(() => {
+    if (initialPercentage === 100) {
+      openPracticeModal()
+    }
+  })
+
   const [pending, startTransition] = useTransition()
   const [hearts, setHearts] = useState(initialHearts)
-  const [percentage, setPercentage] = useState(initialPercentage)
+  const [percentage, setPercentage] = useState(() =>
+    initialPercentage === 100 ? 0 : initialPercentage,
+  )
   const [lessonId] = useState(initialLessonId)
   const [challenges] = useState(initialLessonChallenges)
   const [activeIndex, setActiveIndex] = useState(() => {
@@ -54,16 +77,57 @@ export const Quiz = ({
   const [selectedOption, setSelectedOption] = useState<number>()
   const [status, setStatus] = useState<'correct' | 'wrong' | 'none'>('none')
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [correctAudio, _c, correctControls] = useAudio({ src: '/correct.wav' })
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [incorrectAudio, _i, incorrectControls] = useAudio({
-    src: '/incorrect.wav',
-  })
-  const [finishAudio] = useAudio({ src: '/finish.mp3', autoPlay: true })
-
   const challenge = challenges[activeIndex]
 
+  if (!challenge) {
+    return (
+      <>
+        {finishAudio}
+        <Confetti
+          recycle={false}
+          numberOfPieces={500}
+          tweenDuration={10000}
+          width={width}
+          height={height}
+        />
+        <div className="mx-auto flex h-full max-w-lg flex-col items-center justify-center gap-y-4 text-center lg:gap-y-8">
+          <Image
+            src="/finish.svg"
+            width={100}
+            height={100}
+            alt="Finish"
+            className="hidden lg:block"
+          />
+          <Image
+            src="/finish.svg"
+            width={50}
+            height={50}
+            alt="Finish"
+            className="block lg:hidden"
+          />
+          <h1 className="text-xl font-bold text-neutral-700 lg:text-3xl">
+            Great job! <br /> You&apos;ve completed the lesson
+          </h1>
+          <div className="flex w-full items-center gap-x-4">
+            <ResultCard
+              variant="points"
+              value={challenges.length * POINTS_PER_CHALLENGE}
+            />
+            <ResultCard
+              variant="hearts"
+              value={hearts}
+              hasActiveSubscription={!!userSubscription?.isActive}
+            />
+          </div>
+        </div>
+        <Footer
+          lessonId={lessonId}
+          onCheck={() => router.push(`/learn`)}
+          status="completed"
+        />
+      </>
+    )
+  }
   const options = challenge.challengeOptions ?? []
 
   const onSelect = (id: number) => {
@@ -140,51 +204,7 @@ export const Quiz = ({
       })
     }
   }
-  if (!challenge) {
-    return (
-      <>
-        {finishAudio}
-        <Confetti
-          recycle={false}
-          numberOfPieces={500}
-          tweenDuration={10000}
-          width={width}
-          height={height}
-        />
-        <div className="mx-auto flex h-full max-w-lg flex-col items-center justify-center gap-y-4 text-center lg:gap-y-8">
-          <Image
-            src="/finish.svg"
-            width={100}
-            height={100}
-            alt="Finish"
-            className="hidden lg:block"
-          />
-          <Image
-            src="/finish.svg"
-            width={50}
-            height={50}
-            alt="Finish"
-            className="block lg:hidden"
-          />
-          <h1 className="text-xl font-bold text-neutral-700 lg:text-3xl">
-            Great job! <br /> You&apos;ve completed the lesson
-          </h1>
-          <div className="flex w-full items-center gap-x-4">
-            <ResultCard
-              variant="points"
-              value={challenges.length * POINTS_PER_CHALLENGE}
-            />
-            <ResultCard variant="hearts" value={hearts} />
-          </div>
-        </div>
-        <Footer
-          lessonId={lessonId}
-          onCheck={() => router.push(`/learn`)}
-          status="completed"
-        />
-      </>
-    )
-  }
+
   const title =
     challenge.type === 'ASSIST'
       ? 'Select the correct meaning'
