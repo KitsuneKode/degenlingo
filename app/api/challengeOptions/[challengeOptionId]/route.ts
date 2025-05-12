@@ -6,13 +6,15 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export const GET = async (
   req: NextRequest,
-  { params }: { params: { challengeOptionId: number } },
+  { params }: { params: Promise<{ challengeOptionId: string }> },
 ) => {
+  const { challengeOptionId } = await params
   if (!checkRole('admin')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
   const data = await db.query.challengeOptions.findFirst({
-    where: eq(challengeOptions.id, params.challengeOptionId),
+    where: eq(challengeOptions.id, Number(challengeOptionId)),
   })
 
   return NextResponse.json(data)
@@ -20,8 +22,10 @@ export const GET = async (
 
 export const PUT = async (
   req: NextRequest,
-  { params }: { params: { challengeOptionId: number } },
+  { params }: { params: Promise<{ challengeOptionId: string }> },
 ) => {
+  const { challengeOptionId } = await params
+
   if (!checkRole('admin')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -30,24 +34,25 @@ export const PUT = async (
 
   const data = await db
     .update(challengeOptions)
-    .set({
-      ...body,
-    })
-    .where(eq(challengeOptions.id, params.challengeOptionId))
+    .set({ ...body })
+    .where(eq(challengeOptions.id, Number(challengeOptionId)))
     .returning()
 
   return NextResponse.json(data[0])
 }
+
 export const DELETE = async (
   req: NextRequest,
-  { params }: { params: { challengeOptionId: number } },
+  { params }: { params: Promise<{ challengeOptionId: string }> },
 ) => {
+  const { challengeOptionId } = await params
   if (!checkRole('admin')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
   const data = await db
     .delete(challengeOptions)
-    .where(eq(challengeOptions.id, params.challengeOptionId))
+    .where(eq(challengeOptions.id, Number(challengeOptionId)))
     .returning()
 
   return NextResponse.json(data[0])

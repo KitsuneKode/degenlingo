@@ -2,14 +2,12 @@ import { Quiz } from '@/components/quiz'
 import { redirect } from 'next/navigation'
 import { getLesson, getUserProgress, getUserSubscription } from '@/db/queries'
 
-type Props = {
-  params: {
-    lessonId: number
-  }
-}
-
-const LessonIdPage = async ({ params }: Props) => {
-  const lessonId = (await params).lessonId
+export default async function LessonIdPage({
+  params,
+}: {
+  params: Promise<{ lessonId: number }>
+}) {
+  const { lessonId } = await params
 
   if (!lessonId) {
     redirect('/learn')
@@ -44,5 +42,3 @@ const LessonIdPage = async ({ params }: Props) => {
     />
   )
 }
-
-export default LessonIdPage

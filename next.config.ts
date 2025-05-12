@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  experimental: { dynamicIO: true },
+  // experimental: { dynamicIO: true },
   headers: async () => [
     {
       source: '/api/(.*)',

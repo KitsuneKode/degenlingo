@@ -20,7 +20,6 @@ type Props = {
 }
 
 export const ChallengeCard = ({
-  id,
   text,
   imageSrc,
   shortcut,
@@ -31,6 +30,7 @@ export const ChallengeCard = ({
   type,
   audioSrc,
 }: Props) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [audio, _, controls] = useAudio({ src: audioSrc || '' })
 
   const handleClick = useCallback(() => {

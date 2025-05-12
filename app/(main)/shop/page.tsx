@@ -1,7 +1,8 @@
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
-import { Items } from '@/components/items'
 import { Promo } from '@/components/promo'
+
+import { Items } from '@/components/items'
 import { Quests } from '@/components/quests'
 import { FeedWrapper } from '@/components/feed-wrapper'
 import { UserProgress } from '@/components/user-progress'

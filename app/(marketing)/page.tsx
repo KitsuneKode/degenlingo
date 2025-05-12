@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Loader } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { WalletButton } from '@/components/wallet-button'
 import {
   ClerkLoaded,
   ClerkLoading,
@@ -39,6 +40,9 @@ export default function Home() {
                   Get Started
                 </Button>
               </SignUpButton>
+
+              <WalletButton />
+
               <SignInButton
                 mode="modal"
                 oauthFlow="popup"

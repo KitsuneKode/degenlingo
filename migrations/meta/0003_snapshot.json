@@ -51,12 +51,8 @@
           "name": "challenge_options_challenge_id_challenges_id_fk",
           "tableFrom": "challenge_options",
           "tableTo": "challenges",
-          "columnsFrom": [
-            "challenge_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["challenge_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -103,12 +99,8 @@
           "name": "challenge_progress_challenge_id_challenges_id_fk",
           "tableFrom": "challenge_progress",
           "tableTo": "challenges",
-          "columnsFrom": [
-            "challenge_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["challenge_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -161,12 +153,8 @@
           "name": "challenges_lesson_id_lessons_id_fk",
           "tableFrom": "challenges",
           "tableTo": "lessons",
-          "columnsFrom": [
-            "lesson_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["lesson_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -243,12 +231,8 @@
           "name": "lessons_unit_id_units_id_fk",
           "tableFrom": "lessons",
           "tableTo": "units",
-          "columnsFrom": [
-            "unit_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["unit_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -300,12 +284,8 @@
           "name": "units_course_id_courses_id_fk",
           "tableFrom": "units",
           "tableTo": "courses",
-          "columnsFrom": [
-            "course_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["course_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -367,12 +347,8 @@
           "name": "user_progress_active_course_id_courses_id_fk",
           "tableFrom": "user_progress",
           "tableTo": "courses",
-          "columnsFrom": [
-            "active_course_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["active_course_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -431,23 +407,17 @@
         "user_subscription_user_id_unique": {
           "name": "user_subscription_user_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_id"
-          ]
+          "columns": ["user_id"]
         },
         "user_subscription_stripe_customer_id_unique": {
           "name": "user_subscription_stripe_customer_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "stripe_customer_id"
-          ]
+          "columns": ["stripe_customer_id"]
         },
         "user_subscription_stripe_subscription_id_unique": {
           "name": "user_subscription_stripe_subscription_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "stripe_subscription_id"
-          ]
+          "columns": ["stripe_subscription_id"]
         }
       },
       "policies": {},
@@ -459,10 +429,7 @@
     "public.type": {
       "name": "type",
       "schema": "public",
-      "values": [
-        "SELECT",
-        "ASSIST"
-      ]
+      "values": ["SELECT", "ASSIST"]
     }
   },
   "schemas": {},

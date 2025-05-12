@@ -2,6 +2,7 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Providers } from '@/app/providers'
 import { DM_Mono, Exo_2 } from 'next/font/google'
+import { AppWalletProvider } from '@/app/wallet-provider'
 
 const exo2 = Exo_2({
   variable: '--font-exo-2',
@@ -25,12 +26,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <Providers>
-      <html lang="en">
-        <body className={`${exo2.variable} ${dmMono.variable} antialiased`}>
-          {children}
-        </body>
-      </html>
-    </Providers>
+    <html lang="en">
+      <body className={`${exo2.variable} ${dmMono.variable} antialiased`}>
+        <Providers>
+          <AppWalletProvider>{children}</AppWalletProvider>
+        </Providers>
+      </body>
+    </html>
   )
 }

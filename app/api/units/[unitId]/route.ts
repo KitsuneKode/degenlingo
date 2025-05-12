@@ -6,13 +6,15 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export const GET = async (
   req: NextRequest,
-  { params }: { params: { unitId: number } },
+  { params }: { params: Promise<{ unitId: number }> },
 ) => {
+  const { unitId } = await params
+
   if (!checkRole('admin')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const data = await db.query.units.findFirst({
-    where: eq(units.id, params.unitId),
+    where: eq(units.id, unitId),
   })
 
   return NextResponse.json(data)
@@ -20,8 +22,10 @@ export const GET = async (
 
 export const PUT = async (
   req: NextRequest,
-  { params }: { params: { unitId: number } },
+  { params }: { params: Promise<{ unitId: number }> },
 ) => {
+  const { unitId } = await params
+
   if (!checkRole('admin')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -33,22 +37,21 @@ export const PUT = async (
     .set({
       ...body,
     })
-    .where(eq(units.id, params.unitId))
+    .where(eq(units.id, unitId))
     .returning()
 
   return NextResponse.json(data[0])
 }
 export const DELETE = async (
   req: NextRequest,
-  { params }: { params: { unitId: number } },
+  { params }: { params: Promise<{ unitId: number }> },
 ) => {
+  const { unitId } = await params
+
   if (!checkRole('admin')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  const data = await db
-    .delete(units)
-    .where(eq(units.id, params.unitId))
-    .returning()
+  const data = await db.delete(units).where(eq(units.id, unitId)).returning()
 
   return NextResponse.json(data[0])
 }
