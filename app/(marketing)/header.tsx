@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { Loader } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { WalletButton } from '@/components/wallet-button'
 import {
   ClerkLoaded,
   ClerkLoading,
@@ -26,15 +27,14 @@ export const Header = () => {
         </ClerkLoading>
         <ClerkLoaded>
           <SignedIn>
-            <UserButton />
+            <div className="flex items-center gap-x-6">
+              <WalletButton />
+
+              <UserButton />
+            </div>
           </SignedIn>
           <SignedOut>
-            <SignInButton
-              mode="modal"
-              oauthFlow="popup"
-              signUpFallbackRedirectUrl="/learn"
-              fallbackRedirectUrl="/learn"
-            >
+            <SignInButton mode="modal" oauthFlow="popup">
               <Button size="lg" variant="ghost">
                 Login
               </Button>

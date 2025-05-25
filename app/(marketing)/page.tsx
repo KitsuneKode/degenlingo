@@ -33,21 +33,18 @@ export default function Home() {
               <SignUpButton
                 mode="modal"
                 oauthFlow="popup"
-                signInFallbackRedirectUrl="/learn"
-                fallbackRedirectUrl="/learn"
+                // signInFallbackRedirectUrl="/learn"
+                fallbackRedirectUrl="/"
               >
                 <Button size="lg" variant="secondary" className="w-full">
                   Get Started
                 </Button>
               </SignUpButton>
-
-              <WalletButton />
-
               <SignInButton
                 mode="modal"
                 oauthFlow="popup"
-                signUpFallbackRedirectUrl="/learn"
-                fallbackRedirectUrl="/learn"
+                // signUpFallbackRedirectUrl="/learn"
+                fallbackRedirectUrl="/"
               >
                 <Button size="lg" variant="primaryOutline" className="w-full">
                   I already have an account
@@ -59,6 +56,7 @@ export default function Home() {
               <Button size="lg" variant="secondary" className="w-full" asChild>
                 <Link href="/learn">Continue Learning</Link>
               </Button>
+              <WalletButton />
             </SignedIn>
           </ClerkLoaded>
         </div>

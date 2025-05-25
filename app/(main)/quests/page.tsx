@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
 import { Promo } from '@/components/promo'
+import { Wallet } from '@/components/wallet'
 import { QUESTS_DATA } from '@/lib/constants'
 import { Progress } from '@/components/ui/progress'
 import { FeedWrapper } from '@/components/feed-wrapper'
@@ -32,6 +33,8 @@ export default async function LeaderboardPage() {
           points={userProgress.points}
           hasActiveSubscription={isActiveSubscription}
         />
+        <Wallet />
+
         {!isActiveSubscription && <Promo />}
       </StickyWrapper>
       <FeedWrapper>

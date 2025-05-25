@@ -9,6 +9,9 @@ type Props = {
   order: number
   lessons: (typeof lessons.$inferSelect & { completed: boolean })[]
   activeLessonPercentage: number
+  nftClaimed: boolean
+  nftImageSrc: string
+  unitCompleted: boolean
   activeLesson:
     | (typeof lessons.$inferSelect & {
         unit: typeof units.$inferSelect
@@ -22,10 +25,20 @@ export const Unit = ({
   lessons,
   activeLesson,
   activeLessonPercentage,
+  nftClaimed,
+  nftImageSrc,
+  unitCompleted,
 }: Props) => {
+  console.log('nftClaimed from Unit', nftClaimed)
   return (
     <>
-      <UnitBanner title={title} description={description} />
+      <UnitBanner
+        title={title}
+        description={description}
+        nftClaimed={nftClaimed}
+        nftImageSrc={nftImageSrc}
+        unitCompleted={unitCompleted}
+      />
 
       <div className="relative mb-[48px] flex flex-col items-center">
         {lessons.map((lesson, index) => {

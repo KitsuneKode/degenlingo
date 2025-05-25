@@ -29,6 +29,41 @@
       "when": 1746721947929,
       "tag": "0003_stiff_masked_marvel",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1747224237221,
+      "tag": "0004_long_machine_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1747235644788,
+      "tag": "0005_far_taskmaster",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1747384663966,
+      "tag": "0006_fluffy_warbird",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1748190088201,
+      "tag": "0007_moaning_jack_power",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1748200028501,
+      "tag": "0008_stiff_domino",
+      "breakpoints": true
     }
   ]
 }

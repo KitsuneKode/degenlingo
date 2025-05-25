@@ -39,12 +39,18 @@ const main = async () => {
             title: 'Unit 1',
             description: `Learn the basics of ${course.title}`,
             order: 1,
+            nft: 'nft_1',
+            nftImageSrc: '/solana.png',
+            nftMetadata: 'dasd',
           },
           {
             courseId: course.id,
             title: 'Unit 2',
             description: `Learn intermediate ${course.title}`,
             order: 2,
+            nft: 'nft_2',
+            nftImageSrc: '/nft.png',
+            nftMetadata: 'dasd',
           },
         ])
         .returning()

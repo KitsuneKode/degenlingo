@@ -8,6 +8,7 @@ type Props = {
   activeCourse: typeof courses.$inferSelect
   hearts: number
   points: number
+  tokens: number
   hasActiveSubscription: boolean
 }
 
@@ -15,6 +16,7 @@ export const UserProgress = ({
   activeCourse,
   hearts,
   points,
+  tokens,
   hasActiveSubscription,
 }: Props) => {
   return (
@@ -40,6 +42,18 @@ export const UserProgress = ({
             className="mr-2"
           />
           {points}
+        </Button>
+      </Link>
+      <Link href="/tokens">
+        <Button variant="ghost" className="text-purple-500">
+          <Image
+            src="/token.png"
+            alt="Tokens"
+            width={28}
+            height={28}
+            className="mr-2"
+          />
+          {tokens}
         </Button>
       </Link>
       <Link href="/shop">

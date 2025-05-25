@@ -3,10 +3,15 @@ import { Unit } from '@/components/unit'
 import { redirect } from 'next/navigation'
 import { Promo } from '@/components/promo'
 import { Quests } from '@/components/quests'
-import { getUserSubscription } from '@/db/queries'
+import { Wallet } from '@/components/wallet'
 import { FeedWrapper } from '@/components/feed-wrapper'
 import { UserProgress } from '@/components/user-progress'
 import { StickyWrapper } from '@/components/sticky-wrapper'
+import {
+  getUnclaimedNftsUnits,
+  getUnitsCompleted,
+  getUserSubscription,
+} from '@/db/queries'
 import {
   getUnits,
   getUserProgress,
@@ -20,6 +25,8 @@ export default async function LearnPage() {
   const courseProgressData = getCourseProgress()
   const lessonPercentageData = getLessonPercentage()
   const userSubscriptionData = getUserSubscription()
+  const unclaimedNftsData = getUnclaimedNftsUnits()
+  const completedUnitsData = getUnitsCompleted()
 
   const [
     userProgress,
@@ -27,12 +34,16 @@ export default async function LearnPage() {
     lessonPercentage,
     courseProgress,
     userSubscription,
+    unclaimedNfts,
+    completedUnits,
   ] = await Promise.all([
     userProgressData,
     unitsData,
     lessonPercentageData,
     courseProgressData,
     userSubscriptionData,
+    unclaimedNftsData,
+    completedUnitsData,
   ])
 
   if (!userProgress || !userProgress.activeCourse) {
@@ -52,8 +63,10 @@ export default async function LearnPage() {
           activeCourse={userProgress.activeCourse}
           hearts={userProgress.hearts}
           points={userProgress.points}
+          tokens={userProgress.tokens}
           hasActiveSubscription={isActiveSubscription}
         />
+        <Wallet />
         {!isActiveSubscription && <Promo />}
         <Quests points={userProgress.points} />
       </StickyWrapper>
@@ -69,6 +82,11 @@ export default async function LearnPage() {
               lessons={unit.lessons}
               activeLesson={courseProgress.activeLesson}
               activeLessonPercentage={lessonPercentage}
+              nftClaimed={!unclaimedNfts.some((nft) => nft.id === unit.id)}
+              nftImageSrc={unit.nftImageSrc}
+              unitCompleted={completedUnits.some(
+                (completedUnit) => completedUnit.id === unit.id,
+              )}
             />
           </div>
         ))}

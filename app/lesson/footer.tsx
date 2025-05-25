@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import { CheckCircle } from 'lucide-react'
 import { useKey, useMedia } from 'react-use'
 import { Button } from '@/components/ui/button'
+import { WalletConnectButton } from '@solana/wallet-adapter-react-ui'
 
 type Props = {
   onCheck: () => void
@@ -46,18 +47,23 @@ export const Footer = ({ onCheck, status, disabled, lessonId }: Props) => {
             Practice Again
           </Button>
         )}
-        <Button
-          className="ml-auto"
-          onClick={onCheck}
-          disabled={disabled}
-          size={isMobile ? 'sm' : 'lg'}
-          variant={status === 'wrong' ? 'destructive' : 'secondary'}
-        >
-          {status === 'correct' && 'Next'}
-          {status === 'wrong' && 'Try Again'}
-          {status === 'none' && 'Check'}
-          {status === 'completed' && 'Continue'}
-        </Button>
+        <div className="ml-auto flex w-3/5 items-center">
+          <div className="opacity-80">
+            <WalletConnectButton />
+          </div>
+          <Button
+            className="ml-auto"
+            onClick={onCheck}
+            disabled={disabled}
+            size={isMobile ? 'sm' : 'lg'}
+            variant={status === 'wrong' ? 'destructive' : 'secondary'}
+          >
+            {status === 'correct' && 'Next'}
+            {status === 'wrong' && 'Try Again'}
+            {status === 'none' && 'Check'}
+            {status === 'completed' && 'Continue'}
+          </Button>
+        </div>
       </div>
     </footer>
   )

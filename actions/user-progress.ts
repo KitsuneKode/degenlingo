@@ -13,12 +13,15 @@ import {
 } from '@/db/queries'
 
 export const upsertUserProgress = async (courseId: number) => {
-  const { userId } = await auth()
+  const { userId, sessionClaims } = await auth()
+
   const user = await currentUser()
 
   if (!userId || !user) throw new Error('Unauthorized')
 
   const course = await getCourseById(courseId)
+
+  const walletAddress = sessionClaims?.metadata.wallet?.address
 
   if (!course) throw new Error('Course not found')
 
@@ -32,6 +35,7 @@ export const upsertUserProgress = async (courseId: number) => {
       activeCourseId: courseId,
       userName: user.firstName || 'User',
       userImageSrc: user.imageUrl || '/mascot.svg',
+      walletAddress,
     })
 
     revalidatePath('/courses')
@@ -44,6 +48,7 @@ export const upsertUserProgress = async (courseId: number) => {
     activeCourseId: courseId,
     userName: user.firstName || 'User',
     userImageSrc: user.imageUrl || '/mascot.svg',
+    walletAddress,
   })
 
   revalidatePath('/courses')
@@ -132,4 +137,30 @@ export const refillHearts = async () => {
   revalidatePath('/learn')
   revalidatePath('/quests')
   revalidatePath('/leaderboard')
+}
+
+export const reduceTokens = async () => {
+  const { userId } = await auth()
+
+  if (!userId) throw new Error('Unauthorized')
+
+  const currentUserProgress = await getUserProgress()
+
+  if (!currentUserProgress) throw new Error('User progress not found')
+
+  if (currentUserProgress.tokens === 0) throw new Error('Tokens are empty')
+
+  await db
+    .update(userProgress)
+    .set({
+      tokens: 0,
+    })
+    .where(eq(userProgress.userId, userId))
+
+  revalidatePath('/shop')
+  revalidatePath('/learn')
+  revalidatePath('/quests')
+  revalidatePath('/lessons')
+  revalidatePath('/leaderboard')
+  revalidatePath('/tokens')
 }

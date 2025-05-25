@@ -1,0 +1,1 @@
+ALTER TABLE "units" RENAME COLUMN "nft_mint" TO "nft_metadata";

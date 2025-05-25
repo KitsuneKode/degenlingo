@@ -2,6 +2,7 @@ import Image from 'next/image'
 import { redirect } from 'next/navigation'
 import { Promo } from '@/components/promo'
 import { Quests } from '@/components/quests'
+import { Wallet } from '@/components/wallet'
 import { Separator } from '@/components/ui/separator'
 import { FeedWrapper } from '@/components/feed-wrapper'
 import { UserProgress } from '@/components/user-progress'
@@ -37,8 +38,11 @@ export default async function LeaderboardPage() {
           activeCourse={userProgress.activeCourse}
           hearts={userProgress.hearts}
           points={userProgress.points}
+          tokens={userProgress.tokens}
           hasActiveSubscription={isActiveSubscription}
         />
+        <Wallet />
+
         {!isActiveSubscription && <Promo />}
         <Quests points={userProgress.points} />
       </StickyWrapper>
@@ -73,7 +77,9 @@ export default async function LeaderboardPage() {
               <p className="flex-1 font-bold text-neutral-800">
                 {userProgress.userName}
               </p>
-              <p className="text-muted-foreground">{userProgress.points}XP</p>
+              <p className="text-muted-foreground font-semibold">
+                {userProgress.points} XP
+              </p>
             </div>
           ))}
         </div>

@@ -61,6 +61,8 @@ const main = async () => {
         title: 'Unit 1',
         description: 'Learn the basics of Spanish',
         order: 1,
+        nft: 'nft_1',
+        nftImageSrc: '/nft.png',
       },
     ])
 

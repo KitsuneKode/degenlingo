@@ -1,14 +1,14 @@
 'use server'
 
-import { checkRole } from '@/lib/roles'
-import { clerkClient } from '@clerk/nextjs/server'
+import { checkRole, checkWallet } from '@/lib/roles'
+import { auth, clerkClient } from '@clerk/nextjs/server'
 
 export async function setRole(formData: FormData) {
   const client = await clerkClient()
 
   // Check that the user trying to set the role is an admin
   if (!checkRole('admin')) {
-    return { message: 'Not Authorized' }
+    throw new Error('Not Authorized')
   }
 
   try {
@@ -34,6 +34,33 @@ export async function removeRole(formData: FormData) {
         publicMetadata: { role: null },
       },
     )
+    return { message: res.publicMetadata }
+  } catch (err) {
+    return { message: err }
+  }
+}
+
+export async function setWallet(walletAddress: string) {
+  const { userId } = await auth()
+
+  if (!userId) {
+    throw new Error('Unauthorized')
+  }
+
+  const client = await clerkClient()
+
+  const wallet = await checkWallet(walletAddress)
+
+  if (wallet) {
+    return { message: 'Wallet already set' }
+  }
+
+  try {
+    const res = await client.users.updateUserMetadata(userId, {
+      publicMetadata: {
+        wallet: { address: walletAddress, chain: 'solana' },
+      },
+    })
     return { message: res.publicMetadata }
   } catch (err) {
     return { message: err }

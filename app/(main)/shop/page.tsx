@@ -2,8 +2,9 @@ import Image from 'next/image'
 import { redirect } from 'next/navigation'
 import { Promo } from '@/components/promo'
 
-import { Items } from '@/components/items'
 import { Quests } from '@/components/quests'
+import { Wallet } from '@/components/wallet'
+import { ShopItems } from '@/components/shop-items'
 import { FeedWrapper } from '@/components/feed-wrapper'
 import { UserProgress } from '@/components/user-progress'
 import { StickyWrapper } from '@/components/sticky-wrapper'
@@ -31,8 +32,11 @@ export default async function ShopPage() {
           activeCourse={userProgress.activeCourse}
           hearts={userProgress.hearts}
           points={userProgress.points}
+          tokens={userProgress.tokens}
           hasActiveSubscription={isActiveSubscription}
         />
+        <Wallet />
+
         {!isActiveSubscription && <Promo />}
         <Quests points={userProgress.points} />
       </StickyWrapper>
@@ -46,7 +50,7 @@ export default async function ShopPage() {
             Spend your points on cool stuff
           </p>
 
-          <Items
+          <ShopItems
             hearts={userProgress.hearts}
             points={userProgress.points}
             hasActiveSubscription={isActiveSubscription}

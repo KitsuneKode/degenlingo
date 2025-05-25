@@ -34,14 +34,19 @@ export const Sidebar = ({ className }: Props) => {
         />
         <SidebarItem label="quests" href="/quests" iconScr="/quests.svg" />
         <SidebarItem label="shop" href="/shop" iconScr="/shop.svg" />
+        <SidebarItem label="tokens" href="/tokens" iconScr="/token.png" />
       </div>
 
       <div className="p-4">
         <ClerkLoading>
-          <Loader className="text-muted-foreground h-5 w-5 animate-spin" />
+          <div className="flex items-center justify-center">
+            <Loader className="text-muted-foreground h-5 w-5 animate-spin" />
+          </div>
         </ClerkLoading>
         <ClerkLoaded>
-          <UserButton />
+          <div className="flex flex-col items-center justify-center">
+            <UserButton />
+          </div>
         </ClerkLoaded>
       </div>
     </div>

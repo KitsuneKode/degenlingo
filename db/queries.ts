@@ -10,6 +10,7 @@ import {
   challengeProgress,
   lessons,
   userSubscription,
+  userRedeemedNfts,
 } from '@/db/schema'
 
 export const getUserProgress = cache(async () => {
@@ -20,6 +21,7 @@ export const getUserProgress = cache(async () => {
     where: eq(userProgress.userId, userId),
     with: {
       activeCourse: true,
+      redeemedNfts: true,
     },
   })
   return data
@@ -82,7 +84,7 @@ export const getUnits = cache(async () => {
 
 export const getCourses = cache(async () => {
   const data = await db.query.courses.findMany({
-    // orderBy: (courses, { asc }) => [asc(courses.id)],
+    orderBy: (courses, { asc }) => [asc(courses.id)],
   })
 
   return data
@@ -223,8 +225,8 @@ export const getUserSubscription = cache(async () => {
   if (!data) return null
 
   const isActive =
-    data.stripePriceId &&
-    data.stripeCurrentPeriodEnd.getTime()! + DAY_IN_MS > Date.now()
+    data.subscriptionStatus === 'active' &&
+    data.subscriptionEnd.getTime()! + DAY_IN_MS > Date.now()
 
   return {
     ...data,
@@ -251,4 +253,82 @@ export const getTopTenUsers = cache(async () => {
   if (!data) return []
 
   return data
+})
+
+export const getUnitsCompleted = cache(async () => {
+  const { userId } = await auth()
+
+  if (!userId) return []
+
+  const userProgress = await getUserProgress()
+
+  if (!userProgress) return []
+
+  const units = await getUnits()
+
+  if (!units) return []
+
+  const completedUnits = units.filter((unit) =>
+    unit.lessons.every((lesson) => lesson.completed),
+  )
+  return completedUnits
+})
+
+export const getUnclaimedNftsUnits = cache(async () => {
+  const { userId } = await auth()
+
+  if (!userId) return []
+
+  const completedUnits = await getUnitsCompleted()
+
+  if (!completedUnits) return []
+
+  const redeemedNftsUnits = await db.query.userRedeemedNfts.findMany({
+    where: eq(userRedeemedNfts.userId, userId),
+  })
+
+  const unclaimedUnits = completedUnits.filter(
+    (unit) =>
+      !redeemedNftsUnits.some((redeemedNft) => redeemedNft.unitId === unit.id),
+  )
+
+  return unclaimedUnits
+})
+
+export const getClaimedNftsUnits = cache(async () => {
+  const { userId } = await auth()
+
+  if (!userId) return []
+
+  const redeemedNftsUnits = await db.query.userRedeemedNfts.findMany({
+    where: eq(userRedeemedNfts.userId, userId),
+  })
+
+  return redeemedNftsUnits
+})
+
+export const getRedeemableTokens = cache(async () => {
+  const { userId } = await auth()
+
+  if (!userId) return null
+
+  const userProgress = await getUserProgress()
+
+  if (!userProgress) return null
+
+  return userProgress.tokens
+})
+
+export const getNftDetails = cache(async (unitId: number) => {
+  const { userId } = await auth()
+
+  if (!userId) return null
+
+  const unit = await db.query.units.findFirst({
+    where: eq(units.id, unitId),
+  })
+
+  if (!unit) return null
+
+  return unit
 })
