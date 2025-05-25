@@ -51,12 +51,8 @@
           "name": "challenge_options_challenge_id_challenges_id_fk",
           "tableFrom": "challenge_options",
           "tableTo": "challenges",
-          "columnsFrom": [
-            "challenge_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["challenge_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -103,12 +99,8 @@
           "name": "challenge_progress_challenge_id_challenges_id_fk",
           "tableFrom": "challenge_progress",
           "tableTo": "challenges",
-          "columnsFrom": [
-            "challenge_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["challenge_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -161,12 +153,8 @@
           "name": "challenges_lesson_id_lessons_id_fk",
           "tableFrom": "challenges",
           "tableTo": "lessons",
-          "columnsFrom": [
-            "lesson_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["lesson_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -243,12 +231,8 @@
           "name": "lessons_unit_id_units_id_fk",
           "tableFrom": "lessons",
           "tableTo": "units",
-          "columnsFrom": [
-            "unit_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["unit_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -300,12 +284,8 @@
           "name": "solana_subscription_details_user_subscription_id_user_subscription_id_fk",
           "tableFrom": "solana_subscription_details",
           "tableTo": "user_subscription",
-          "columnsFrom": [
-            "user_subscription_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_subscription_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -315,9 +295,7 @@
         "solana_subscription_details_user_subscription_id_unique": {
           "name": "solana_subscription_details_user_subscription_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_subscription_id"
-          ]
+          "columns": ["user_subscription_id"]
         }
       },
       "policies": {},
@@ -371,12 +349,8 @@
           "name": "stripe_subscription_details_user_subscription_id_user_subscription_id_fk",
           "tableFrom": "stripe_subscription_details",
           "tableTo": "user_subscription",
-          "columnsFrom": [
-            "user_subscription_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_subscription_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -386,9 +360,7 @@
         "stripe_subscription_details_user_subscription_id_unique": {
           "name": "stripe_subscription_details_user_subscription_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_subscription_id"
-          ]
+          "columns": ["user_subscription_id"]
         }
       },
       "policies": {},
@@ -454,12 +426,8 @@
           "name": "units_course_id_courses_id_fk",
           "tableFrom": "units",
           "tableTo": "courses",
-          "columnsFrom": [
-            "course_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["course_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -534,12 +502,8 @@
           "name": "user_progress_active_course_id_courses_id_fk",
           "tableFrom": "user_progress",
           "tableTo": "courses",
-          "columnsFrom": [
-            "active_course_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["active_course_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -598,12 +562,8 @@
           "name": "user_redeemed_nfts_user_id_user_progress_user_id_fk",
           "tableFrom": "user_redeemed_nfts",
           "tableTo": "user_progress",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["user_id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -611,12 +571,8 @@
           "name": "user_redeemed_nfts_unit_id_units_id_fk",
           "tableFrom": "user_redeemed_nfts",
           "tableTo": "units",
-          "columnsFrom": [
-            "unit_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["unit_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -692,12 +648,8 @@
           "name": "user_subscription_user_id_user_progress_user_id_fk",
           "tableFrom": "user_subscription",
           "tableTo": "user_progress",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "user_id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["user_id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -713,28 +665,17 @@
     "public.type": {
       "name": "type",
       "schema": "public",
-      "values": [
-        "SELECT",
-        "ASSIST"
-      ]
+      "values": ["SELECT", "ASSIST"]
     },
     "public.payment_method": {
       "name": "payment_method",
       "schema": "public",
-      "values": [
-        "stripe",
-        "solana"
-      ]
+      "values": ["stripe", "solana"]
     },
     "public.subscription_status": {
       "name": "subscription_status",
       "schema": "public",
-      "values": [
-        "active",
-        "cancelled",
-        "expired",
-        "pending"
-      ]
+      "values": ["active", "cancelled", "expired", "pending"]
     }
   },
   "schemas": {},
