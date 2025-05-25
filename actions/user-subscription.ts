@@ -19,9 +19,13 @@ export const createStripeUrl = async () => {
 
   logger.info('userSubscription', userSubscription)
 
-  if (userSubscription && userSubscription.stripeCustomerId) {
+  if (
+    userSubscription &&
+    userSubscription.paymentMethod === 'stripe' &&
+    userSubscription.subscriptionDetails
+  ) {
     const stripeSession = await stripe.billingPortal.sessions.create({
-      customer: userSubscription.stripeCustomerId,
+      customer: userSubscription.subscriptionDetails.stripeCustomerId,
       return_url: returnUrl,
     })
 

@@ -11,6 +11,7 @@ import {
   lessons,
   userSubscription,
   userRedeemedNfts,
+  stripeSubscriptionDetails,
 } from '@/db/schema'
 
 export const getUserProgress = cache(async () => {
@@ -228,9 +229,29 @@ export const getUserSubscription = cache(async () => {
     data.subscriptionStatus === 'active' &&
     data.subscriptionEnd.getTime()! + DAY_IN_MS > Date.now()
 
+  if (data.paymentMethod === 'stripe') {
+    const existingSubscriptionDetails =
+      await db.query.stripeSubscriptionDetails.findFirst({
+        where: eq(stripeSubscriptionDetails.userSubscriptionId, data.id),
+      })
+
+    if (!existingSubscriptionDetails)
+      return {
+        ...data,
+        isActive: !!isActive,
+        subscriptionDetails: null,
+      }
+    return {
+      ...data,
+      isActive: !!isActive,
+      subscriptionDetails: existingSubscriptionDetails,
+    }
+  }
+
   return {
     ...data,
     isActive: !!isActive,
+    subscriptionDetails: null,
   }
 })
 

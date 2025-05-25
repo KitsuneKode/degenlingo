@@ -31,6 +31,7 @@ export default async function LeaderboardPage() {
           activeCourse={userProgress.activeCourse}
           hearts={userProgress.hearts}
           points={userProgress.points}
+          tokens={userProgress.tokens}
           hasActiveSubscription={isActiveSubscription}
         />
         <Wallet />
