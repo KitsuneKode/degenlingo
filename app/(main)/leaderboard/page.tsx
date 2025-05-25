@@ -1,8 +1,11 @@
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
 import { Promo } from '@/components/promo'
+
 import { Quests } from '@/components/quests'
+
 import { Wallet } from '@/components/wallet'
+
 import { Separator } from '@/components/ui/separator'
 import { FeedWrapper } from '@/components/feed-wrapper'
 import { UserProgress } from '@/components/user-progress'

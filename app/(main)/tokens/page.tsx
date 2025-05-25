@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { Promo } from '@/components/promo'
 
 import { Quests } from '@/components/quests'
+
 import { Wallet } from '@/components/wallet'
 import { TokenItems } from '@/components/token-items'
 import { FeedWrapper } from '@/components/feed-wrapper'
