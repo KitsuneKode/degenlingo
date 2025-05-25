@@ -1,6 +1,6 @@
 // 'use client'
 
-// import { useEffect } from 'react'
+// import { useEffect, useCallback } from 'react';
 // import { useWallet } from '@solana/wallet-adapter-react'
 // import { authenticateWithSolana } from '@/actions/create-user'
 // import { useAuth, useSession, useSignIn, useSignUp } from '@clerk/nextjs'
@@ -104,41 +104,112 @@
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@clerk/nextjs'
-import { useEffect, useTransition } from 'react'
+import { checkWallet } from '@/lib/roles'
 import { setWallet } from '@/actions/role_check'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
+import { useCallback, useEffect, useRef, useTransition } from 'react'
+
 const isDevelopment = process.env.NODE_ENV === 'development'
+
 interface Props {
   className?: string
 }
+
 export const WalletButton = ({ className }: Props) => {
   const { isSignedIn } = useAuth()
-  const { connected, publicKey } = useWallet()
+  const { connected, publicKey, signMessage } = useWallet()
   const [pending, startTransition] = useTransition()
+  const walletSet = useRef(false)
+  const isProcessing = useRef(false) // Add processing flag
+
+  const handleSignIn = useCallback(async () => {
+    if (!publicKey || !signMessage) return
+
+    const encodedMessage = new TextEncoder().encode(
+      `Sign this message to authenticate with our app: ${Date.now()}`,
+    )
+
+    const signatureBytes = await signMessage(encodedMessage)
+
+    if (!signatureBytes) {
+      toast.error('Failed to sign message')
+      return
+    }
+
+    const signatureArray = Array.from(signatureBytes)
+    const messageArray = Array.from(encodedMessage)
+
+    return { signatureArray, messageArray }
+  }, [publicKey, signMessage])
 
   useEffect(() => {
-    if (!isSignedIn || connected || pending) return
-
-    if (publicKey) {
-      startTransition(() => {
-        setWallet(publicKey.toString())
-          .then((res) => {
-            if (res.message === 'Wallet already set') {
-              toast.info('Wallet already set')
-              return
-            }
-            toast.success('Wallet set')
-          })
-          .catch((err) => {
-            if (isDevelopment) {
-              console.log(err)
-            }
-            toast.error('Something went wrong')
-          })
-      })
+    // Early returns to prevent unnecessary processing
+    if (
+      !isSignedIn ||
+      !connected ||
+      !publicKey ||
+      !signMessage ||
+      pending ||
+      walletSet.current ||
+      isProcessing.current // Prevent concurrent processing
+    ) {
+      return
     }
-  }, [isSignedIn, publicKey, connected, pending])
+
+    // Set processing flag immediately
+    isProcessing.current = true
+
+    startTransition(async () => {
+      try {
+        // First check if wallet already exists
+        const existingWallet = await checkWallet(publicKey.toString())
+
+        if (existingWallet) {
+          walletSet.current = true
+          isProcessing.current = false
+          return
+        }
+
+        // Only sign if wallet doesn't exist
+        const response = await handleSignIn()
+
+        if (!response || !response.signatureArray || !response.messageArray) {
+          isProcessing.current = false
+          return
+        }
+
+        const result = await setWallet(
+          publicKey.toString(),
+          response.signatureArray,
+          response.messageArray,
+        )
+
+        if (result.message === 'Wallet already set') {
+          toast.info('Wallet already set')
+        } else {
+          toast.success('Wallet set')
+        }
+
+        walletSet.current = true
+      } catch (err) {
+        if (isDevelopment) {
+          console.log(err)
+        }
+        toast.error('Something went wrong')
+      } finally {
+        isProcessing.current = false
+      }
+    })
+  }, [isSignedIn, publicKey, connected, pending, signMessage]) // Remove handleSignIn from deps
+
+  // Reset flags when wallet disconnects
+  useEffect(() => {
+    if (!connected) {
+      walletSet.current = false
+      isProcessing.current = false
+    }
+  }, [connected])
 
   return (
     <>

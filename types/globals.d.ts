@@ -6,6 +6,7 @@ export type Roles = 'admin' | 'user'
 export type SolWallet = {
   address: string
   chain: 'solana'
+  verified: boolean
 }
 
 declare global {
