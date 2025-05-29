@@ -3,7 +3,6 @@
 import React, { useMemo } from 'react'
 import { clusterApiUrl } from '@solana/web3.js'
 import '@solana/wallet-adapter-react-ui/styles.css'
-import { UnsafeBurnerWalletAdapter } from '@solana/wallet-adapter-wallets'
 
 // Default styles that can be overridden by your app
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
@@ -23,7 +22,7 @@ export const AppWalletProvider = ({
   const wallets = useMemo(
     () => [
       // manually add any legacy wallet adapters here
-      new UnsafeBurnerWalletAdapter(),
+      // new UnsafeBurnerWalletAdapter(),
     ],
     [],
   )

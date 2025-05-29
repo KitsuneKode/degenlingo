@@ -54,6 +54,13 @@ export default async function ShopPage() {
             hearts={userProgress.hearts}
             points={userProgress.points}
             hasActiveSubscription={isActiveSubscription}
+            subscriptionType={
+              userSubscription?.solanaSubscriptionDetails
+                ? 'solana'
+                : userSubscription?.stripeSubscriptionDetails
+                  ? 'stripe'
+                  : null
+            }
           />
         </div>
       </FeedWrapper>

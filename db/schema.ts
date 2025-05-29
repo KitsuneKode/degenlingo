@@ -279,12 +279,16 @@ export const solanaSubscriptionDetails = pgTable(
       .unique()
       .references(() => userSubscription.id, { onDelete: 'cascade' }),
 
+    reference: text('reference').notNull(),
     solanaWalletAddress: text('solana_wallet_address').notNull(),
     solanaTransactionSignature: text('solana_transaction_signature').notNull(),
     solanaTokenAmount: decimal('solana_token_amount', {
       precision: 20,
       scale: 9,
     }).notNull(),
+    solanaTransactionStatus: text('solana_transaction_status').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
   },
 )
 

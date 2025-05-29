@@ -5,37 +5,33 @@ import Image from 'next/image'
 import { useTransition } from 'react'
 import { Button } from '@/components/ui/button'
 import { refillHearts } from '@/actions/user-progress'
-import { createStripeUrl } from '@/actions/user-subscription'
+import { usePaymentModal } from '@/store/use-payment-modal'
 import { HEARTS_REFILL_COST, MAX_HEARTS } from '@/lib/constants'
 
 type Props = {
   hearts: number
   points: number
   hasActiveSubscription: boolean
+  subscriptionType: 'stripe' | 'solana' | null
 }
 
-export const ShopItems = ({ hearts, points, hasActiveSubscription }: Props) => {
+export const ShopItems = ({
+  hearts,
+  points,
+  hasActiveSubscription,
+  subscriptionType,
+}: Props) => {
   const [pending, startTransition] = useTransition()
+
+  const { open: openPaymentModal } = usePaymentModal()
+
+  console.log({ subscriptionType })
 
   const onRefillHearts = () => {
     if (pending || hearts === MAX_HEARTS || points < HEARTS_REFILL_COST) return
 
     startTransition(() => {
       refillHearts().catch(() => toast.error('Something went wrong'))
-    })
-  }
-
-  const onUpgrade = () => {
-    if (pending) return
-
-    startTransition(() => {
-      createStripeUrl()
-        .then((res) => {
-          if (res.data) {
-            window.location.href = res.data
-          }
-        })
-        .catch(() => toast.error('Something went wrong'))
     })
   }
 
@@ -50,11 +46,14 @@ export const ShopItems = ({ hearts, points, hasActiveSubscription }: Props) => {
         </div>
         <Button
           disabled={
-            pending || hearts === MAX_HEARTS || points < HEARTS_REFILL_COST
+            pending ||
+            hearts === MAX_HEARTS ||
+            points < HEARTS_REFILL_COST ||
+            hasActiveSubscription
           }
           onClick={onRefillHearts}
         >
-          {hearts === MAX_HEARTS ? (
+          {hearts === MAX_HEARTS || hasActiveSubscription ? (
             'full'
           ) : (
             <div className="flex items-center">
@@ -70,9 +69,26 @@ export const ShopItems = ({ hearts, points, hasActiveSubscription }: Props) => {
           <p className="text-base font-bold text-neutral-700 lg:text-xl">
             Unlimited hearts
           </p>
+          <p className="text-sm text-neutral-500">
+            Choose Stripe or Solana payment
+          </p>
         </div>
-        <Button disabled={pending} onClick={onUpgrade}>
-          {hasActiveSubscription ? 'settings' : 'upgrade'}
+        <Button
+          variant={
+            subscriptionType === 'solana' && hasActiveSubscription
+              ? 'secondary'
+              : 'default'
+          }
+          disabled={
+            pending || (subscriptionType === 'solana' && hasActiveSubscription)
+          }
+          onClick={openPaymentModal}
+        >
+          {hasActiveSubscription
+            ? subscriptionType === 'stripe'
+              ? 'settings'
+              : 'premium active'
+            : 'upgrade'}
         </Button>
       </div>
     </ul>

@@ -39,6 +39,7 @@ export default async function LessonIdPage({
       initialHearts={userProgress.hearts}
       initialPercentage={initialPercentage}
       userSubscription={userSubscription}
+      initialTokens={userProgress.tokens}
     />
   )
 }

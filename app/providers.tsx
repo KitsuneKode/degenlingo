@@ -21,6 +21,7 @@ import { Toaster } from 'sonner'
 import { ClerkProvider } from '@clerk/nextjs'
 import { ExitModal } from '@/components/modals/exit-modal'
 import { HeartsModal } from '@/components/modals/hearts-modal'
+import { PaymentModal } from '@/components/modals/payment-modal'
 import { PracticeModal } from '@/components/modals/practice-modal'
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
@@ -45,6 +46,8 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
         <WalletProvider wallets={wallets} autoConnect>
           <WalletModalProvider>
             <PracticeModal />
+            <PaymentModal />
+
             {children}
           </WalletModalProvider>
         </WalletProvider>

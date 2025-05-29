@@ -39,7 +39,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'UserId is required' }, { status: 400 })
     }
 
-    logger.info('User subscription created', subscription)
+    logger.info('User subscription created by stripe', subscription)
 
     const userSubscriptionData = await db
       .insert(userSubscription)
@@ -72,7 +72,7 @@ export async function POST(req: Request) {
       session.subscription as string,
     )
 
-    logger.info('User subscription updated', subscription)
+    logger.info('User subscription updated by stripe', subscription)
 
     const stripeSubscriptionDetailsData = await db
       .update(stripeSubscriptionDetails)

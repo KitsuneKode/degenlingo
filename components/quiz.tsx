@@ -22,6 +22,7 @@ import { challengeOptions, challenges, userSubscription } from '@/db/schema'
 type Props = {
   initialLessonId: number
   initialHearts: number
+  initialTokens: number
   initialPercentage: number
   initialLessonChallenges: (typeof challenges.$inferSelect & {
     completed: boolean
@@ -37,6 +38,7 @@ type Props = {
 export const Quiz = ({
   initialLessonId,
   initialHearts,
+  initialTokens,
   initialPercentage,
   initialLessonChallenges,
   userSubscription,
@@ -62,6 +64,7 @@ export const Quiz = ({
 
   const [pending, startTransition] = useTransition()
   const [hearts, setHearts] = useState(initialHearts)
+  const [tokens] = useState(initialTokens)
   const [percentage, setPercentage] = useState(() =>
     initialPercentage === 100 ? 0 : initialPercentage,
   )
@@ -113,6 +116,7 @@ export const Quiz = ({
               variant="points"
               value={challenges.length * POINTS_PER_CHALLENGE}
             />
+            <ResultCard variant="tokens" value={tokens} />
             <ResultCard
               variant="hearts"
               value={hearts}

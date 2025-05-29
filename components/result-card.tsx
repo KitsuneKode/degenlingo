@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils'
 import { InfinityIcon } from 'lucide-react'
 
 type Props = {
-  variant: 'points' | 'hearts'
+  variant: 'points' | 'hearts' | 'tokens'
   value: number
   hasActiveSubscription?: boolean
 }
@@ -13,7 +13,12 @@ export const ResultCard = ({
   value,
   hasActiveSubscription,
 }: Props) => {
-  const imageSrc = variant === 'points' ? '/points.svg' : '/heart.svg'
+  const imageSrc =
+    variant === 'tokens'
+      ? '/token.png'
+      : variant === 'points'
+        ? '/points.svg'
+        : '/heart.svg'
 
   return (
     <div
@@ -21,6 +26,7 @@ export const ResultCard = ({
         'w-full rounded-2xl border-2',
         variant === 'points' && 'border-orange-400 bg-orange-400',
         variant === 'hearts' && 'border-rose-500 bg-rose-500',
+        variant === 'tokens' && 'border-cyan-500 bg-cyan-500',
       )}
     >
       <div
@@ -28,15 +34,21 @@ export const ResultCard = ({
           'rounded-t-xl p-1.5 text-center text-xs font-bold text-white uppercase',
           variant === 'points' && 'bg-orange-400',
           variant === 'hearts' && 'bg-rose-500',
+          variant === 'tokens' && 'bg-cyan-500',
         )}
       >
-        {variant === 'hearts' ? 'Hearts left' : 'Total XP'}
+        {variant === 'hearts'
+          ? 'Hearts left'
+          : variant === 'tokens'
+            ? 'Total tokens'
+            : 'Total XP'}
       </div>
       <div
         className={cn(
           'flex items-center justify-center rounded-2xl bg-white p-6 text-lg font-bold',
           variant === 'points' && 'text-orange-400',
           variant === 'hearts' && 'text-rose-500',
+          variant === 'tokens' && 'text-cyan-500',
         )}
       >
         <Image

@@ -1,3 +1,7 @@
+export const SUBSCRIPTION_PRICE = 20 //USD
+
+export const SUBSCRIPTION_DURATION = 30 * 24 * 60 * 60 * 1000
+
 export const MAX_HEARTS = 5
 
 export const SINGIN_POINTS_AMOUNT = 60
@@ -10,7 +14,9 @@ export const DAY_IN_MS = 24 * 60 * 60 * 1000
 
 export const TOKENS_PER_NFT = 80
 
-export const TOKENS_PER_QUEST = 10
+export const TOKENS_PER_CHALLENGE = 10
+
+export const TOKENS_PER_QUEST = 100
 
 export const SIGNIN_TOKENS_AMOUNT = 60
 

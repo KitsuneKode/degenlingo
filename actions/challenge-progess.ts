@@ -4,9 +4,13 @@ import db from '@/db/drizzle'
 import { and, eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@clerk/nextjs/server'
-import { MAX_HEARTS } from '@/lib/constants'
 import { getUserProgress, getUserSubscription } from '@/db/queries'
 import { challengeProgress, challenges, userProgress } from '@/db/schema'
+import {
+  MAX_HEARTS,
+  POINTS_PER_CHALLENGE,
+  TOKENS_PER_CHALLENGE,
+} from '@/lib/constants'
 
 export const upsertChallengeProgress = async (
   challengeId: number,
@@ -68,7 +72,7 @@ export const upsertChallengeProgress = async (
       .update(userProgress)
       .set({
         hearts: Math.min(currentUserProgress.hearts + 1, MAX_HEARTS),
-        points: currentUserProgress.points + 10,
+        points: currentUserProgress.points + POINTS_PER_CHALLENGE,
       })
       .where(eq(userProgress.userId, userId))
 
@@ -89,7 +93,9 @@ export const upsertChallengeProgress = async (
   await db
     .update(userProgress)
     .set({
-      points: currentUserProgress.points + 10,
+      hearts: Math.min(currentUserProgress.hearts + 1, MAX_HEARTS),
+      points: currentUserProgress.points + POINTS_PER_CHALLENGE,
+      tokens: currentUserProgress.tokens + TOKENS_PER_CHALLENGE,
     })
     .where(eq(userProgress.userId, userId))
 

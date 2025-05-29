@@ -12,6 +12,7 @@ import {
   userSubscription,
   userRedeemedNfts,
   stripeSubscriptionDetails,
+  solanaSubscriptionDetails,
 } from '@/db/schema'
 
 export const getUserProgress = cache(async () => {
@@ -221,6 +222,7 @@ export const getUserSubscription = cache(async () => {
 
   const data = await db.query.userSubscription.findFirst({
     where: eq(userSubscription.userId, userId),
+    with: {},
   })
 
   if (!data) return null
@@ -239,19 +241,28 @@ export const getUserSubscription = cache(async () => {
       return {
         ...data,
         isActive: !!isActive,
-        subscriptionDetails: null,
+        stripeSubscriptionDetails: null,
+        solanaSubscriptionDetails: null,
       }
+
     return {
       ...data,
       isActive: !!isActive,
-      subscriptionDetails: existingSubscriptionDetails,
+      stripeSubscriptionDetails: existingSubscriptionDetails,
+      solanaSubscriptionDetails: null,
     }
   }
+
+  const existingSubscriptionDetails =
+    await db.query.solanaSubscriptionDetails.findFirst({
+      where: eq(solanaSubscriptionDetails.userSubscriptionId, data.id),
+    })
 
   return {
     ...data,
     isActive: !!isActive,
-    subscriptionDetails: null,
+    stripeSubscriptionDetails: null,
+    solanaSubscriptionDetails: existingSubscriptionDetails,
   }
 })
 
