@@ -1,0 +1,15 @@
+{
+  "name": "Degen Lingo",
+  "symbol": "DGN",
+  "description": "Degen Lingo Token",
+  "image": "https://raw.githubusercontent.com/KitsuneKode/degenlingo/refs/heads/main/public/token.png",
+  "external_url": "https://degenlingo.com",
+  "seller_fee_basis_points": 0,
+  "creators": [
+    {
+      "address": "D2q5LcrUmHYF5PZQqkwzmhgA8QbbFy9STF5RztBk36QX",
+      "share": 100,
+      "verified": true
+    }
+  ]
+}
