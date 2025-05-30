@@ -90,3 +90,23 @@ export async function setWallet(
     return { message: err }
   }
 }
+export async function unsetWallet() {
+  const { userId } = await auth()
+
+  if (!userId) {
+    throw new Error('Unauthorized')
+  }
+
+  const client = await clerkClient()
+
+  try {
+    const res = await client.users.updateUserMetadata(userId, {
+      publicMetadata: {
+        wallet: null,
+      },
+    })
+    return { message: res.publicMetadata }
+  } catch (err) {
+    return { error: (err as Error).message }
+  }
+}

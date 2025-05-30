@@ -13,25 +13,25 @@ Whether you're stacking sats, stacking tokens, or stacking vocab, DegenLingo is 
 
 ## ✨ Key Features
 
-* **Interactive Lessons**
+- **Interactive Lessons**
   Bite‑sized exercises, progress bars, and confetti celebrations for each milestone (`react-circular-progressbar`, `react-confetti`, `sonner`).
-* **Dual‑Mode Payments**
+- **Dual‑Mode Payments**
   Accept both Stripe (fiat) and Solana (crypto) for premium packs and in‑app purchases.
-* **On‑Chain Badge Minting**
+- **On‑Chain Badge Minting**
   Early adopters earn exclusive NFT badges via Metaplex as proof of OG status.
-* **Token Rewards**
+- **Token Rewards**
   Earn native tokens for lesson completions, streaks, and special challenges—redeemable for perks or swapped on-chain.
-* **Serverless NeonDB + Drizzle ORM**
+- **Serverless NeonDB + Drizzle ORM**
   Lightning‑fast data storage with zero‑config migrations & Drizzle Studio UI (`drizzle-kit`, `@neondatabase/serverless`).
-* **Solana Wallet Login**
+- **Solana Wallet Login**
   Connect your Phantom or Solflare wallet in one click using `@solana/wallet-adapter-react` + `@wallet-adapter-wallets`.
-* **Clerk Authentication**
+- **Clerk Authentication**
   Magic links, OAuth, and passwordless flows (`@clerk/nextjs`).
-* **Admin Dashboard**
+- **Admin Dashboard**
   Spin up a React‑Admin panel in seconds to manage users, content, tokens, and badge drops (`react-admin`, `ra-data-simple-rest`).
-* **Dark/Light Themes**
+- **Dark/Light Themes**
   Toggle between cozy dark mode or bright light mode with `next-themes`.
-* **TypeScript & Next.js 15**
+- **TypeScript & Next.js 15**
   Future‑proof stack with the latest Next.js turbo‑charged capabilities.
 
 ---
@@ -116,18 +116,18 @@ Run `bun run format` & `bun run lint` before each PR.
 
 ## 📦 Scripts Overview
 
-| Script          | Description                       |
-| --------------- | --------------------------------- |
-| `dev`           | Start Next dev server             |
-| `build`         | Compile & optimize for production |
-| `start`         | Run the built app                 |
-| `lint`          | Run ESLint checks                 |
-| `format`        | Run Prettier formatting           |
-| `db:generate`   | Generate Drizzle ORM types        |
-| `db:migrate`    | Apply DB migrations               |
-| `db:seed`       | Seed the database                 |
-| `db:studio`     | Launch Drizzle Studio UI          |
-| `db:reset`      | Drop & reset DB                   |
+| Script              | Description                       |
+| ------------------- | --------------------------------- |
+| `dev`               | Start Next dev server             |
+| `build`             | Compile & optimize for production |
+| `start`             | Run the built app                 |
+| `lint`              | Run ESLint checks                 |
+| `format`            | Run Prettier formatting           |
+| `db:generate`       | Generate Drizzle ORM types        |
+| `db:migrate`        | Apply DB migrations               |
+| `db:seed`           | Seed the database                 |
+| `db:studio`         | Launch Drizzle Studio UI          |
+| `db:reset`          | Drop & reset DB                   |
 | ~~`deploy:vercel`~~ | ~~Deploy to Vercel~~ (autodeploy) |
 
 ---
@@ -144,9 +144,7 @@ Run `bun run format` & `bun run lint` before each PR.
 
 ### Future Plans
 
-
-
-#### Docker 
+#### Docker
 
 ```bash
 docker build -t degenlingo .
@@ -157,15 +155,15 @@ docker-compose up
 
 ## 🎉 Early Adopter Rewards
 
-* **NFT Badge Mint**: First 500 sign-ups get an exclusive on-chain badge!
-* **Token Airdrop**: Milestone-based token distributions—complete 10 lessons to unlock your first token batch.
+- **NFT Badge Mint**: First 500 sign-ups get an exclusive on-chain badge!
+- **Token Airdrop**: Milestone-based token distributions—complete 10 lessons to unlock your first token batch.
 
 ---
 
 ## 👑 License & Code of Conduct
 
-* **License**: MIT
-* **Code of Conduct**: Be awesome to each other. No rug pulls allowed!
+- **License**: MIT
+- **Code of Conduct**: Be awesome to each other. No rug pulls allowed!
 
 ---
 

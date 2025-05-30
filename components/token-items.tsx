@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { TOKENS_PER_NFT } from '@/lib/constants'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import { useTokenModal } from '@/store/use-token-modal'
 import { claimNftCheck } from '@/actions/redeem-tokens'
 import { usePaymentModal } from '@/store/use-payment-modal'
 import { base58 } from '@metaplex-foundation/umi-serializers'
@@ -54,20 +55,21 @@ export const TokenItems = ({
   // const transactionSignature = useRef('')
 
   // const router = useRouter()
-
+  const rpcUrl = process.env.SOLANA_RPC_URL
   const { open: openPaymentModal } = usePaymentModal()
+  const { open: openTokenModal } = useTokenModal()
 
-  // const umi = useMemo(() => {
-  //   if (!connected || !walletPublicKey) return null
+  const umi = useMemo(() => {
+    if (!connected || !walletPublicKey || !rpcUrl) return null
 
-  //   return createUmi(process.env.SOLANA_RPC_URL!, 'confirmed')
-  //     .use(mplTokenMetadata())
-  //     .use(
-  //       walletAdapterIdentity({
-  //         publicKey: walletPublicKey,
-  //       }),
-  //     )
-  // }, [connected, walletPublicKey])
+    return createUmi(rpcUrl, 'confirmed')
+      .use(mplTokenMetadata())
+      .use(
+        walletAdapterIdentity({
+          publicKey: walletPublicKey,
+        }),
+      )
+  }, [connected, walletPublicKey, rpcUrl])
 
   // const onUpgrade = () => {
   //   if (pending || !walletPublicKey) return
@@ -307,6 +309,38 @@ export const TokenItems = ({
             : 'upgrade'}
         </Button>
       </div>
+      <div className="flex w-full items-center justify-between gap-x-4 border-t-2 p-4">
+        <Image
+          src="/token.png"
+          alt="Unlimited"
+          width={60}
+          height={60}
+          className="rounded-xl"
+        />
+        <div className="flex-1">
+          <p className="text-base font-bold text-neutral-700 lg:text-xl">
+            Redeem your tokens
+          </p>
+          <p className="text-sm text-neutral-500">Get them in your wallet</p>
+        </div>
+        <Button
+          variant={
+            subscriptionType === 'solana' && hasActiveSubscription
+              ? 'secondary'
+              : 'default'
+          }
+          disabled={
+            pending || (subscriptionType === 'solana' && hasActiveSubscription)
+          }
+          onClick={openPaymentModal}
+        >
+          {hasActiveSubscription
+            ? subscriptionType === 'stripe'
+              ? 'settings'
+              : 'premium active'
+            : 'upgrade'}
+        </Button>
+      </div>
 
       {/* NFT Claims Section */}
       {unclaimedNfts.length === 0 && false ? (
@@ -374,6 +408,14 @@ export const TokenItems = ({
           className="w-full"
         >
           Upgrade to Premium
+        </Button>
+        <Button
+          variant="default"
+          disabled={pending}
+          onClick={() => openTokenModal(tokens)}
+          className="w-full"
+        >
+          Redeem Tokens
         </Button>
       </div>
     </ul>

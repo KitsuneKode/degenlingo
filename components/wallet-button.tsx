@@ -105,8 +105,8 @@ import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@clerk/nextjs'
 import { checkWallet } from '@/lib/roles'
-import { setWallet } from '@/actions/role_check'
 import { useWallet } from '@solana/wallet-adapter-react'
+import { setWallet, unsetWallet } from '@/actions/role_check'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
 import { useCallback, useEffect, useRef, useTransition } from 'react'
 
@@ -118,10 +118,11 @@ interface Props {
 
 export const WalletButton = ({ className }: Props) => {
   const { isSignedIn } = useAuth()
-  const { connected, publicKey, signMessage } = useWallet()
+  const { connected, disconnecting, publicKey, signMessage } = useWallet()
   const [pending, startTransition] = useTransition()
   const walletSet = useRef(false)
   const isProcessing = useRef(false) // Add processing flag
+  const prevPubkey = useRef<string | null>(null)
 
   const handleSignIn = useCallback(async () => {
     if (!publicKey || !signMessage) return
@@ -204,12 +205,30 @@ export const WalletButton = ({ className }: Props) => {
   }, [isSignedIn, publicKey, connected, pending, signMessage]) // Remove handleSignIn from deps
 
   // Reset flags when wallet disconnects
+
   useEffect(() => {
-    if (!connected) {
-      walletSet.current = false
-      isProcessing.current = false
+    const prev = prevPubkey.current
+    const curr = publicKey?.toString() ?? null
+
+    // if we had a wallet bound and either disconnected or changed keys
+    if (
+      (walletSet.current && (disconnecting || (prev && prev !== curr))) ||
+      pending
+    ) {
+      startTransition(() => {
+        unsetWallet()
+          .then((r) => {
+            if (r.message) toast('Wallet association removed')
+          })
+
+          .finally(() => {
+            walletSet.current = false
+            isProcessing.current = false
+          })
+      })
     }
-  }, [connected])
+    prevPubkey.current = curr
+  }, [publicKey, disconnecting, pending])
 
   return (
     <>

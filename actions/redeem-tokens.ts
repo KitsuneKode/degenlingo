@@ -6,11 +6,18 @@ import bs58 from 'bs58'
 import logger from '@/lib/logger'
 import { reduceTokens } from './user-progress'
 import { MIN_REDEEMABLE_TOKEN_AMOUNT } from '@/lib/constants'
-import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import { getNftDetails, getRedeemableTokens } from '@/db/queries'
 import {
+  Connection,
+  Keypair,
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  Transaction,
+} from '@solana/web3.js'
+import {
+  createMintToCheckedInstruction,
   getOrCreateAssociatedTokenAccount,
-  mintTo,
+  mintToChecked,
   TOKEN_2022_PROGRAM_ID,
 } from '@solana/spl-token'
 
@@ -71,7 +78,10 @@ return { success: true }
 }
 */
 
-export const redeemTokens = async (userWalletAddress: string) => {
+export const redeemTokens = async (
+  userWalletAddress: string,
+  tokensToRedeem: number,
+) => {
   const { userId, sessionClaims } = await auth()
 
   if (!userId) throw new Error('Unauthorized')
@@ -79,7 +89,9 @@ export const redeemTokens = async (userWalletAddress: string) => {
   const walletAddress = sessionClaims.metadata.wallet?.address
   if (!walletAddress) throw new Error('Wallet address not found')
 
-  const feePayer = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY!))
+  const feePayer = Keypair.fromSecretKey(
+    bs58.decode(process.env.MINT_PRIVATE_KEY!),
+  )
   if (!feePayer) throw new Error('Fee payer not found')
 
   if (userWalletAddress !== walletAddress)
@@ -88,15 +100,26 @@ export const redeemTokens = async (userWalletAddress: string) => {
   const redeemableTokensAmount = await getRedeemableTokens()
   if (!redeemableTokensAmount) throw new Error('Redeemable tokens not found')
 
-  if (redeemableTokensAmount < MIN_REDEEMABLE_TOKEN_AMOUNT)
+  if (
+    redeemableTokensAmount < MIN_REDEEMABLE_TOKEN_AMOUNT ||
+    tokensToRedeem > redeemableTokensAmount
+  )
     return { error: 'Not enough redeemable tokens' }
 
-  const connection = new Connection(process.env.SOLANA_RPC_URL!, 'confirmed')
+  const connection = new Connection(process.env.SOLANA_RPC_URL!, {
+    wsEndpoint: process.env.SOLANA_WS_URL!,
+    commitment: 'confirmed',
+  })
 
   const mintAddress = new PublicKey(process.env.MINT_ADDRESS!)
   if (!mintAddress) throw new Error('Mint address not found')
 
   const userWallet = new PublicKey(userWalletAddress)
+
+  logger.info(`User Wallet Address:`, {
+    walletAddress,
+    mintAddress,
+  })
 
   const associatedTokenAccount = await getOrCreateAssociatedTokenAccount(
     connection,
@@ -105,9 +128,7 @@ export const redeemTokens = async (userWalletAddress: string) => {
     userWallet,
     false,
     'confirmed',
-    {
-      commitment: 'confirmed',
-    },
+    {},
     TOKEN_2022_PROGRAM_ID,
   )
 
@@ -115,27 +136,53 @@ export const redeemTokens = async (userWalletAddress: string) => {
     ata: associatedTokenAccount.address.toBase58(),
   })
 
-  const transactionSignature = await mintTo(
-    connection,
-    feePayer,
+  const amountToMint = BigInt(tokensToRedeem * LAMPORTS_PER_SOL)
+
+  const mintTx = createMintToCheckedInstruction(
     mintAddress,
     associatedTokenAccount.address,
     feePayer.publicKey,
-    redeemableTokensAmount,
-    [],
-    {
-      commitment: 'confirmed',
-    },
+    amountToMint,
+    9,
+    undefined,
     TOKEN_2022_PROGRAM_ID,
+  )
+  const { blockhash, lastValidBlockHeight } =
+    await connection.getLatestBlockhash('confirmed')
+
+  const tx = new Transaction().add(mintTx)
+
+  tx.feePayer = feePayer.publicKey
+  tx.recentBlockhash = blockhash
+  tx.sign(feePayer)
+
+  const rawTx = tx.serialize()
+
+  logger.info(`Raw Transaction:`, {
+    rawTx,
+  })
+
+  const signature = await connection.sendRawTransaction(rawTx, {
+    skipPreflight: false,
+    preflightCommitment: 'confirmed',
+  })
+
+  await connection.confirmTransaction(
+    {
+      blockhash: blockhash,
+      lastValidBlockHeight: lastValidBlockHeight,
+      signature: signature,
+    },
+    'confirmed',
   )
 
   logger.info(`Transaction Signature:`, {
-    signature: transactionSignature,
+    signature,
   })
 
-  await reduceTokens()
+  await reduceTokens(tokensToRedeem)
 
-  return { transactionSignature }
+  return { signature }
 }
 
 export const claimNftCheck = async (

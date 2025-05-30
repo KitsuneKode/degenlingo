@@ -139,7 +139,7 @@ export const refillHearts = async () => {
   revalidatePath('/leaderboard')
 }
 
-export const reduceTokens = async () => {
+export const reduceTokens = async (amount: number) => {
   const { userId } = await auth()
 
   if (!userId) throw new Error('Unauthorized')
@@ -150,10 +150,12 @@ export const reduceTokens = async () => {
 
   if (currentUserProgress.tokens === 0) throw new Error('Tokens are empty')
 
+  if (currentUserProgress.tokens < amount) throw new Error('Not enough tokens')
+
   await db
     .update(userProgress)
     .set({
-      tokens: 0,
+      tokens: currentUserProgress.tokens - amount,
     })
     .where(eq(userProgress.userId, userId))
 
