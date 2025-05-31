@@ -1,0 +1,22 @@
+{
+  "name": "DegenLingo Premium",
+  "symbol": "DGLP",
+  "description": "Unlocks premium features and content on DegenLingo.",
+  "image": "https://raw.githubusercontent.com/KitsuneKode/degenlingo/refs/heads/main/public/icon.jpeg",
+  "attributes": [
+    { "trait_type": "Tier", "value": "Premium" },
+    { "trait_type": "Access Level", "value": "Full" }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://raw.githubusercontent.com/KitsuneKode/degenlingo/refs/heads/main/public/icon.jpeg",
+        "type": "image/jpeg"
+      }
+    ],
+    "category": "image"
+  },
+  "creators": [
+    { "address": "D2q5LcrUmHYF5PZQqkwzmhgA8QbbFy9STF5RztBk36QX", "share": 100 }
+  ]
+}
