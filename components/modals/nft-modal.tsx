@@ -43,7 +43,7 @@ export const NFTModal = () => {
     nftName,
     nftDescription,
     transactionSignature,
-    setTransactionSignature,
+    // setTransactionSignature,
     stage,
     setStage,
   } = useNFTModal()
@@ -106,14 +106,14 @@ export const NFTModal = () => {
   const handleStartMinting = () => {
     setStage('minting')
     // Call the global mintNFT function that was set in token-items.tsx
-    if (typeof window !== 'undefined' && window.mintNFT) {
-      // Clear any previous transaction signature
-      setTransactionSignature('')
-      window.mintNFT()
-    } else {
-      toast.error('Minting function not available')
-      setStage('preview')
-    }
+    // if (typeof window !== 'undefined' && window.mintNFT) {
+    //   // Clear any previous transaction signature
+    //   setTransactionSignature('')
+    //   window.mintNFT()
+    // } else {
+    toast.error('Minting function not available')
+    setStage('preview')
+    // }
   }
 
   const handleClose = () => {
@@ -280,7 +280,7 @@ export const NFTModal = () => {
                       className="rounded-xl shadow-lg"
                     />
                     {transactionSignature && (
-                      <div className="absolute -bottom-2 -right-2 h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                      <div className="absolute -right-2 -bottom-2 flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           className="h-6 w-6 text-green-600"
@@ -317,7 +317,7 @@ export const NFTModal = () => {
                 <div className="flex flex-col gap-y-4">
                   <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
                     <h3 className="mb-2 font-semibold">Transaction Details</h3>
-                    <div className="text-muted-foreground max-w-md break-words text-xs font-mono">
+                    <div className="text-muted-foreground max-w-md font-mono text-xs break-words">
                       {transactionSignature}
                     </div>
                   </div>
@@ -359,5 +359,5 @@ export const NFTModal = () => {
         )}
       </DialogContent>
     </Dialog>
-  );
+  )
 }
