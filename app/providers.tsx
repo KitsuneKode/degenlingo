@@ -5,7 +5,6 @@ import { Toaster } from 'sonner'
 import { ClerkProvider } from '@clerk/nextjs'
 import { Analytics } from '@vercel/analytics/next'
 import { NFTModal } from '@/components/modals/nft-modal'
-import { AppWalletProvider } from '@/app/wallet-provider'
 import { ExitModal } from '@/components/modals/exit-modal'
 import { TokenModal } from '@/components/modals/token-modal'
 import { HeartsModal } from '@/components/modals/hearts-modal'
@@ -18,13 +17,11 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
       <Toaster richColors theme="system" />
       <ExitModal />
       <HeartsModal />
-      <AppWalletProvider>
-        <PracticeModal />
-        <PaymentModal />
-        <NFTModal />
-        {children}
-        <TokenModal />
-      </AppWalletProvider>
+      <PracticeModal />
+      <PaymentModal />
+      <NFTModal />
+      {children}
+      <TokenModal />
       <Analytics />
     </ClerkProvider>
   )
