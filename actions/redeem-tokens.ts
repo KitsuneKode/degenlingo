@@ -179,7 +179,6 @@ export const claimSubscriptionNft = async (userWalletAddress: string) => {
     const metadataUri = process.env.SUBSCRIPTION_METADATA_URI!
 
     const recipientPublickey = publicKey(userWalletAddress)
-    throw new Error()
     const mintTxBuilder = mintToCollectionV1(umi, {
       leafOwner: recipientPublickey,
       merkleTree: merkleTree,

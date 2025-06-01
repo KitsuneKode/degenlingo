@@ -28,9 +28,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${exo2.variable} ${dmMono.variable} antialiased`}>
-        <Providers>
-          <AppWalletProvider>{children}</AppWalletProvider>
-        </Providers>
+        <AppWalletProvider>
+          <Providers>{children}</Providers>
+        </AppWalletProvider>
       </body>
     </html>
   )
