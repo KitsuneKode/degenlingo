@@ -25,8 +25,6 @@ export const ShopItems = ({
 
   const { open: openPaymentModal } = usePaymentModal()
 
-  console.log({ subscriptionType })
-
   const onRefillHearts = () => {
     if (pending || hearts === MAX_HEARTS || points < HEARTS_REFILL_COST) return
 

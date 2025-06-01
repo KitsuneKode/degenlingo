@@ -3,39 +3,19 @@
 import { toast } from 'sonner'
 import Image from 'next/image'
 import { units } from '@/db/schema'
-import { useRouter } from 'next/navigation'
+import { useTransition } from 'react'
 import { Button } from '@/components/ui/button'
 import { TOKENS_PER_NFT } from '@/lib/constants'
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
-import { claimNftCheck } from '@/actions/redeem-tokens'
+import { useNFTModal } from '@/store/use-nft-modal'
 import { useTokenModal } from '@/store/use-token-modal'
+import { useWallet } from '@solana/wallet-adapter-react'
 import { usePaymentModal } from '@/store/use-payment-modal'
-import { base58 } from '@metaplex-foundation/umi-serializers'
-import { useCallback, useMemo, useRef, useTransition } from 'react'
-import { initiateSolanaPayment } from '@/actions/user-subscription'
-import { createUmi } from '@metaplex-foundation/umi-bundle-defaults'
-import { useConnection, useWallet } from '@solana/wallet-adapter-react'
-import { upsertSolanaSubcription } from '@/actions/solana-subscription'
-import { walletAdapterIdentity } from '@metaplex-foundation/umi-signer-wallet-adapters'
-import {
-  generateSigner,
-  percentAmount,
-  publicKey,
-} from '@metaplex-foundation/umi'
-import {
-  createNft,
-  mplTokenMetadata,
-} from '@metaplex-foundation/mpl-token-metadata'
-import {
-  SystemProgram,
-  SystemInstruction,
-  Transaction,
-  LAMPORTS_PER_SOL,
-} from '@solana/web3.js'
+import { claimSubscriptionNft } from '../actions/redeem-tokens'
 
 type Props = {
   tokens: number
   hasActiveSubscription: boolean
+  claimedPremiumNft?: boolean
   unclaimedNfts: (typeof units.$inferSelect)[]
   activeCourseName: string
   subscriptionType: 'stripe' | 'solana' | null
@@ -46,129 +26,18 @@ export const TokenItems = ({
   hasActiveSubscription,
   unclaimedNfts,
   activeCourseName,
+  claimedPremiumNft,
   subscriptionType,
 }: Props) => {
   const [pending, startTransition] = useTransition()
 
-  const { publicKey: walletPublicKey, connected, sendTransaction } = useWallet()
-  // const { connection } = useConnection()
-  // const transactionSignature = useRef('')
+  const { publicKey: walletPublicKey, connected } = useWallet()
 
-  // const router = useRouter()
-  const rpcUrl = process.env.SOLANA_RPC_URL
   const { open: openPaymentModal } = usePaymentModal()
   const { open: openTokenModal } = useTokenModal()
+  const { open: openNftModal } = useNFTModal()
 
-  const umi = useMemo(() => {
-    if (!connected || !walletPublicKey || !rpcUrl) return null
-
-    return createUmi(rpcUrl, 'confirmed')
-      .use(mplTokenMetadata())
-      .use(
-        walletAdapterIdentity({
-          publicKey: walletPublicKey,
-        }),
-      )
-  }, [connected, walletPublicKey, rpcUrl])
-
-  // const onUpgrade = () => {
-  //   if (pending || !walletPublicKey) return
-
-  //   startTransition(async () => {
-  //     try {
-
-  //       setStatus('initiating')
-  //       setStatusMessage('Initiating Solana payment...')
-  //       const { transactionBase64, reference, expectedSolAmount } =
-  //         await initiateSolanaPayment(walletPublicKey.toString())
-
-  //         if (transactionBase64 && reference && expectedSolAmount) {
-  //           setStatus('awaiting')
-  //           setStatusMessage('Please confirm the transaction in your wallet')
-  //         } else {
-  //           throw new Error('Failed to initiate Solana payment')
-  //         }
-
-  //       const transaction = Transaction.from(
-  //         Buffer.from(transactionBase64, 'base64'),
-  //       )
-
-  //       const firstInstruction = transaction.instructions[0]
-
-  //       if (
-  //         !firstInstruction ||
-  //         !firstInstruction.programId.equals(SystemProgram.programId) ||
-  //         !firstInstruction.data ||
-  //         !firstInstruction.keys[0].pubkey.equals(walletPublicKey)
-  //       ) {
-  //         const decodedTransfer =
-  //           SystemInstruction.decodeTransfer(firstInstruction)
-  //         if (
-  //           decodedTransfer.lamports !==
-  //           BigInt(Number(expectedSolAmount) * LAMPORTS_PER_SOL)
-  //         ) {
-  //           toast.error('Transaction amount mismatch')
-  //           return
-  //         }
-  //         toast.error('Transaction details tampered with or invalid. Aborting.')
-  //         return
-  //       }
-
-  //       transactionSignature.current = await sendTransaction(
-  //         transaction,
-  //         connection,
-  //         { skipPreflight: false },
-  //       )
-
-  //       await upsertSolanaSubcription(
-  //         walletPublicKey.toString(),
-  //         reference,
-  //         expectedSolAmount,
-  //         transactionSignature.current,
-  //         'processed',
-  //       )
-
-  //       const latestBlockHash = await connection.getLatestBlockhash()
-
-  //       await connection.confirmTransaction(
-  //         {
-  //           blockhash: latestBlockHash.blockhash,
-  //           lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
-  //           signature: transactionSignature.current,
-  //         },
-  //         'confirmed',
-  //       )
-
-  //       await upsertSolanaSubcription(
-  //         walletPublicKey.toString(),
-  //         reference,
-  //         expectedSolAmount,
-  //         transactionSignature.current,
-  //         'confirmed',
-  //       )
-
-  //       router.refresh()
-
-  //       toast.success(
-  //         `Payment successful! Transaction: ${transactionSignature.current}`,
-  //       )
-  //     } catch (err) {
-  //       if (err instanceof Error && err.message?.includes('User rejected')) {
-  //         toast.error('Transaction was rejected by the user.')
-  //         setStatus('error')
-  //         setStatusMessage('Transaction was rejected by the user.')
-  //         return
-  //       }
-
-  //       console.log(err)
-  //       toast.error('Transaction failed. Please try again.')
-  //       setStatus('error')
-  //       setStatusMessage('Failed to initiate payment. Please try again.')
-  //     }
-  //   })
-  // }
-
-  const onClaimNft = (nftId: number) => {
+  const onClaimNft = (nftId?: number) => {
     if (pending) return
 
     if (!connected || !walletPublicKey) {
@@ -186,12 +55,19 @@ export const TokenItems = ({
     startTransition(async () => {
       try {
         // ✅ First check server-side validation and update database
-        await claimNftCheck(nftId, walletPublicKey.toBase58())
+        if (!nftId) {
+          const transaction = await claimSubscriptionNft(
+            walletPublicKey.toBase58(),
+          )
 
-        // ✅ Then mint the actual NFT
-        // await mintNft(nftId)
+          if (transaction.error || !transaction.success) {
+            throw new Error(transaction.error || 'Failed to claim NFT')
+          }
 
-        toast.success('NFT claimed successfully!')
+          toast.success('NFT claimed successfully!')
+        } else {
+          toast.success('UNIT NFT coming soon!')
+        }
       } catch (error) {
         console.error('Failed to claim NFT:', error)
         toast.error('Failed to claim NFT. Please try again.')
@@ -199,69 +75,6 @@ export const TokenItems = ({
     })
   }
 
-  // ✅ Complete NFT minting implementation
-  // const mintNft = useCallback(
-  //   async (nftId: number) => {
-  //     if (!umi || !walletPublicKey || !connected) {
-  //       throw new Error('Wallet not connected or UMI not initialized')
-  //     }
-
-  //     try {
-  //       // Find the NFT data from unclaimedNfts
-  //       const nftData = unclaimedNfts.find((nft) => nft.id === nftId)
-  //       if (!nftData) {
-  //         throw new Error('NFT data not found')
-  //       }
-
-  //       console.log('Minting NFT:', {
-  //         unitTitle: nftData.title,
-  //         recipient: walletPublicKey.toBase58(),
-  //         metadataUri: nftData.nftMetadata,
-  //       })
-
-  //       // ✅ Generate new mint keypair
-  //       const nftMint = generateSigner(umi)
-
-  //       // ✅ Create the NFT
-  //       const transaction = await createNft(umi, {
-  //         mint: nftMint,
-  //         authority: umi.identity,
-  //         name: `${nftData.title} - Completed`,
-  //         symbol: 'LANG',
-  //         uri: nftData.nftMetadata, // ✅ Use metadata from database
-  //         sellerFeeBasisPoints: percentAmount(5, 2), // 5% royalty
-  //         tokenOwner: publicKey(walletPublicKey.toBase58()), // ✅ User gets the NFT
-  //         creators: [
-  //           {
-  //             address: umi.identity.publicKey,
-  //             share: 100,
-  //             verified: true,
-  //           },
-  //         ],
-  //       }).sendAndConfirm(umi, {
-  //         confirm: { commitment: 'finalized' },
-  //       })
-
-  //       console.log('NFT Minted Successfully!')
-  //       console.log('Mint Address:', nftMint.publicKey)
-  //       console.log(
-  //         'Transaction:',
-  //         base58.deserialize(transaction.signature)[0],
-  //       )
-
-  //       return {
-  //         mintAddress: nftMint.publicKey,
-  //         transaction: base58.deserialize(transaction.signature)[0],
-  //       }
-  //     } catch (error) {
-  //       console.error('NFT minting failed:', error)
-  //       throw error
-  //     }
-  //   },
-  //   [umi, walletPublicKey, connected, unclaimedNfts],
-  // )
-
-  // ✅ Show wallet connection prompt if not connected
   if (!connected) {
     return (
       <div className="w-full p-8 text-center">
@@ -343,6 +156,40 @@ export const TokenItems = ({
       </div>
 
       {/* NFT Claims Section */}
+      {hasActiveSubscription && (
+        <div className="flex w-full items-center justify-between gap-x-4 border-t-2 p-4">
+          <Image
+            src="/icon.jpeg"
+            alt="Premium"
+            width={60}
+            height={60}
+            className="rounded-lg"
+          />
+          <div className="flex-1">
+            <p className="text-base font-bold text-neutral-700 lg:text-xl">
+              Claim NFT: Degenlingo Premium
+            </p>
+            <p className="text-sm text-neutral-500">
+              {hasActiveSubscription
+                ? 'Free with Premium'
+                : `Costs ${TOKENS_PER_NFT} tokens`}
+            </p>
+          </div>
+          <Button
+            variant={claimedPremiumNft ? 'primary' : 'default'}
+            disabled={
+              pending ||
+              (!hasActiveSubscription && tokens < TOKENS_PER_NFT) ||
+              claimedPremiumNft
+            }
+            onClick={() => onClaimNft()}
+            className="min-w-[100px]"
+          >
+            {pending ? 'Minting...' : claimedPremiumNft ? 'Claimed' : 'Claim'}
+          </Button>
+        </div>
+      )}
+
       {unclaimedNfts.length === 0 && false ? (
         <div className="p-8 text-center text-neutral-500">
           <p>Complete units to unlock NFT rewards!</p>
@@ -416,6 +263,16 @@ export const TokenItems = ({
           className="w-full"
         >
           Redeem Tokens
+        </Button>
+        <Button
+          variant="default"
+          disabled={pending}
+          onClick={() =>
+            openNftModal('/icon.jpeg', 'Premium', 'Degenlingo Premium')
+          }
+          className="w-full"
+        >
+          NFT Claim
         </Button>
       </div>
     </ul>

@@ -38,6 +38,7 @@ export const TokenModal = () => {
   const transactionSignature = useRef('')
   const { publicKey: walletPublicKey } = useWallet()
   const router = useRouter()
+  const progress = useRef(0)
 
   useEffect(() => {
     setIsClient(true)
@@ -54,6 +55,30 @@ export const TokenModal = () => {
       if (status === 'completed') resetStatus()
     }
   }, [tokenAmount, isOpen, status])
+
+  useEffect(() => {
+    if (status === 'processing') {
+      progress.current = 10 // Start with 10%
+
+      const timer1 = setTimeout(() => {
+        progress.current = 30
+      }, 1000)
+
+      const timer2 = setTimeout(() => {
+        progress.current = 60
+      }, 2000)
+
+      const timer3 = setTimeout(() => {
+        progress.current = 90
+      }, 3000)
+
+      return () => {
+        clearTimeout(timer1)
+        clearTimeout(timer2)
+        clearTimeout(timer3)
+      }
+    }
+  }, [status])
 
   if (!isClient) {
     return null
@@ -289,7 +314,7 @@ export const TokenModal = () => {
                         <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
                           <div
                             className="h-full rounded-full bg-purple-500 transition-all duration-500"
-                            style={{ width: '70%' }}
+                            style={{ width: `${progress.current}%` }}
                           />
                         </div>
                       </div>

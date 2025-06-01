@@ -122,7 +122,6 @@ export const WalletButton = ({ className }: Props) => {
   const [pending, startTransition] = useTransition()
   const walletSet = useRef(false)
   const isProcessing = useRef(false) // Add processing flag
-  const prevPubkey = useRef<string | null>(null)
 
   const handleSignIn = useCallback(async () => {
     if (!publicKey || !signMessage) return
@@ -207,18 +206,14 @@ export const WalletButton = ({ className }: Props) => {
   // Reset flags when wallet disconnects
 
   useEffect(() => {
-    const prev = prevPubkey.current
-    const curr = publicKey?.toString() ?? null
+    if ((!walletSet.current || isProcessing.current) && !disconnecting) return
 
-    // if we had a wallet bound and either disconnected or changed keys
-    if (
-      (walletSet.current && (disconnecting || (prev && prev !== curr))) ||
-      pending
-    ) {
+    if (disconnecting) {
+      isProcessing.current = true
       startTransition(() => {
         unsetWallet()
           .then((r) => {
-            if (r.message) toast('Wallet association removed')
+            if (r.message) toast.warning('Wallet association removed')
           })
 
           .finally(() => {
@@ -227,7 +222,6 @@ export const WalletButton = ({ className }: Props) => {
           })
       })
     }
-    prevPubkey.current = curr
   }, [publicKey, disconnecting, pending])
 
   return (

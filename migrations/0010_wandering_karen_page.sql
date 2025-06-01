@@ -1,0 +1,1 @@
+ALTER TABLE "user_subscription" ADD COLUMN "subscription_nft_claimed" boolean DEFAULT false NOT NULL;

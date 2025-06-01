@@ -2,6 +2,10 @@ export const SUBSCRIPTION_PRICE = 20 //USD
 
 export const SUBSCRIPTION_DURATION = 30 * 24 * 60 * 60 * 1000
 
+export const PLATFORM_FEE_AMOUNT_SOL = 0.00005 // 0.00005 SOL per mint
+
+export const SUBSCRIPTION_NFT_MINT_FEE_TOKEN = 200
+
 export const MAX_HEARTS = 5
 
 export const SINGIN_POINTS_AMOUNT = 60

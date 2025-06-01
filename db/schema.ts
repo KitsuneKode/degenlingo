@@ -211,6 +211,10 @@ export const userSubscription = pgTable('user_subscription', {
   // }),
 
   // common subscription state
+
+  subscriptionNftClaimed: boolean('subscription_nft_claimed')
+    .notNull()
+    .default(false),
   subscriptionStatus: subscriptionStatusEnum('subscription_status')
     .notNull()
     .default('pending'),

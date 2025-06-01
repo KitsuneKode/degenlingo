@@ -5,8 +5,15 @@ import { auth } from '@clerk/nextjs/server'
 import bs58 from 'bs58'
 import logger from '@/lib/logger'
 import { reduceTokens } from './user-progress'
-import { MIN_REDEEMABLE_TOKEN_AMOUNT } from '@/lib/constants'
-import { getNftDetails, getRedeemableTokens } from '@/db/queries'
+import {
+  getNftDetails,
+  getRedeemableTokens,
+  getUserSubscription,
+} from '@/db/queries'
+import {
+  MIN_REDEEMABLE_TOKEN_AMOUNT,
+  SUBSCRIPTION_NFT_MINT_FEE_TOKEN,
+} from '@/lib/constants'
 import {
   Connection,
   Keypair,
@@ -17,66 +24,17 @@ import {
 import {
   createMintToCheckedInstruction,
   getOrCreateAssociatedTokenAccount,
-  mintToChecked,
   TOKEN_2022_PROGRAM_ID,
 } from '@solana/spl-token'
 
-import { createUmi } from '@metaplex-foundation/umi-bundle-defaults'
+import { checkWallet } from '@/lib/roles'
+import { getUmi } from '@/lib/solana-nft'
+import { publicKey } from '@metaplex-foundation/umi'
 import {
-  createProgrammableNft,
-  fetchDigitalAsset,
-  mplTokenMetadata,
-} from '@metaplex-foundation/mpl-token-metadata'
-import {
-  generateSigner,
-  keypairIdentity,
-  percentAmount,
-  PublicKey as UmiPublicKey,
-} from '@metaplex-foundation/umi'
-
-/**
- * Claim an NFT for a user
- * This will add the NFT to the user's redeemed NFTs
-export const claimNft = async (unitId: number) => {
-const { userId } = await auth()
-
-if (!userId) throw new Error('Unauthorized')
-
-const currentUserProgress = await getUserProgress()
-
-if (!currentUserProgress) throw new Error('User progress not found')
-
-// Check if the unit exists
-const unit = await db.query.units.findFirst({
-where: eq(units.id, unitId),
-})
-  
-  if (!unit) throw new Error('Unit not found')
-  
-  // Check if the NFT has already been redeemed
-  const existingRedemption = await db.query.userRedeemedNfts.findFirst({
-  where: and(
-  eq(userRedeemedNfts.userId, userId),
-  eq(userRedeemedNfts.unitId, unitId)
-),
-})
-
-if (existingRedemption) throw new Error('NFT already claimed')
-
-// Add the NFT to the user's redeemed NFTs
-await db.insert(userRedeemedNfts).values({
-userId,
-unitId,
-})
-
-revalidatePath('/shop')
-revalidatePath('/learn')
-revalidatePath('/units')
-revalidatePath(`/units/${unitId}`)
-
-return { success: true }
-}
-*/
+  findLeafAssetIdPda,
+  mintToCollectionV1,
+  parseLeafFromMintV1Transaction,
+} from '@metaplex-foundation/mpl-bubblegum'
 
 export const redeemTokens = async (
   userWalletAddress: string,
@@ -185,10 +143,160 @@ export const redeemTokens = async (
   return { signature }
 }
 
-export const claimNftCheck = async (
-  unitId: number,
-  userWalletAddress: string,
-) => {
+export const claimSubscriptionNft = async (userWalletAddress: string) => {
+  const { userId } = await auth()
+
+  if (!userId) throw new Error('Unauthorized')
+
+  const walletAddress = await checkWallet(userWalletAddress)
+  if (!walletAddress) throw new Error('Wallet address mismatch')
+
+  const userSubscription = await getUserSubscription()
+
+  if (!userSubscription || userSubscription?.subscriptionStatus !== 'active') {
+    throw new Error('User is not subscribed')
+  }
+
+  if (userSubscription?.subscriptionNftClaimed) {
+    throw new Error('Subscription NFT already claimed')
+  }
+
+  const redeemableTokensAmount = await getRedeemableTokens()
+  if (!redeemableTokensAmount) throw new Error('Redeemable tokens not found')
+
+  if (redeemableTokensAmount < SUBSCRIPTION_NFT_MINT_FEE_TOKEN)
+    return {
+      error:
+        'Not enough redeemable tokens, You need at least 200 tokens to mint a subscription nft',
+    }
+  try {
+    const umi = getUmi(process.env.MINT_PRIVATE_KEY!)
+
+    const merkleTree = publicKey(process.env.MERKLE_TREE_ADDRESS!)
+
+    const collectionMint = publicKey(process.env.COLLECTION_MINT_ADDRESS!)
+
+    const metadataUri = process.env.SUBSCRIPTION_METADATA_URI!
+
+    const recipientPublickey = publicKey(userWalletAddress)
+    throw new Error()
+    const mintTxBuilder = mintToCollectionV1(umi, {
+      leafOwner: recipientPublickey,
+      merkleTree: merkleTree,
+      collectionMint: collectionMint,
+
+      metadata: {
+        name: 'DegenLingo Collection',
+        symbol: 'DLCC',
+        uri: metadataUri,
+        sellerFeeBasisPoints: 0,
+        collection: {
+          key: collectionMint,
+          verified: false,
+        },
+        creators: [
+          {
+            address: umi.identity.publicKey,
+            verified: true,
+            share: 100,
+          },
+        ],
+      },
+    })
+
+    const { signature, result } = await mintTxBuilder.sendAndConfirm(umi, {
+      send: { commitment: 'confirmed' },
+    })
+
+    const mintSignature = bs58.encode(signature)
+
+    logger.info('Mint Signature:', {
+      result,
+      mintSignature,
+      link: `https://explorer.solana.com/tx/${mintSignature}`,
+    })
+    // const transaction = new Transaction()
+    // transaction.add(mintTx)
+
+    // // --- NEW: Add a SystemProgram.transfer instruction for the platform fee ---
+    // if (PLATFORM_FEE_AMOUNT_SOL > 0) {
+    //   const transferIx = SystemProgram.transfer({
+    //     fromPubkey: new PublicKey(recipientPublickey), // User pays the fee
+    //     toPubkey: new PublicKey(process.env.PROJECT_SUBSCRIPTION_WALLET!), // Your platform's wallet receives the fee
+    //     lamports: BigInt(PLATFORM_FEE_AMOUNT_SOL * LAMPORTS_PER_SOL),
+    //   })
+    //   transaction.add(transferIx)
+    //   console.log(
+    //     `Adding platform fee of ${PLATFORM_FEE_AMOUNT_SOL} SOL to ${process.env.PROJECT_SUBSCRIPTION_WALLET!}`,
+    //   )
+    // }
+
+    // // Set the user's wallet as the primary fee payer for the entire transaction
+    // transaction.feePayer = new PublicKey(recipientPublickey)
+
+    // // Get the latest blockhash
+    // transaction.recentBlockhash = (
+    //   await connection.getLatestBlockhash()
+    // ).blockhash
+
+    // // 4. Partially sign the transaction with the minter's private key
+    // // This signature covers the minting instruction (which the minter has authority over).
+
+    // // 5. Serialize the transaction for the frontend
+    // const serializedTransaction = transaction
+    //   .serialize({ requireAllSignatures: false, verifySignatures: false })
+    //   .toString('base64')
+
+    // logger.info('Serialized Transaction:', serializedTransaction)
+
+    console.log('Finding Asset ID...')
+    const leaf = await parseLeafFromMintV1Transaction(umi, signature)
+
+    const assetId = findLeafAssetIdPda(umi, {
+      merkleTree: merkleTree,
+      leafIndex: leaf.nonce,
+    })
+
+    logger.info('Compressed NFT Asset ID:', {
+      assetId: assetId.toString(),
+    })
+
+    return {
+      success: true,
+      transactionSignature: mintSignature,
+      assetLink: `https://explorer.solana.com/tx/${assetId.toString().split(',')[0]}?cluster=devnet`,
+      link: `https://explorer.solana.com/tx/${mintSignature}?cluster=devnet`,
+    }
+  } catch (error) {
+    logger.error('Error minting certificate on server:', error)
+
+    if (
+      error instanceof Error &&
+      error.message.includes('Not enough redeemable tokens')
+    ) {
+      return {
+        success: false,
+        error: 'Not enough redeemable tokens',
+      }
+    }
+
+    if (
+      error instanceof Error &&
+      error.message.includes('Wallet address does not match')
+    ) {
+      return {
+        success: false,
+        error: 'Wallet address mismatch, please try again',
+      }
+    }
+    return {
+      success: false,
+      error: 'Failed to mint subscription NFT',
+    }
+  }
+}
+
+export const claimNft = async (unitId: number, userWalletAddress: string) => {
   const { userId, sessionClaims } = await auth()
 
   if (!userId) throw new Error('Unauthorized')
@@ -210,94 +318,20 @@ export const claimNftCheck = async (
   if (!nftDetails) throw new Error('NFT details not found')
 
   return nftDetails
-  // const umi = createUmi(process.env.SOLANA_RPC_URL!, 'confirmed')
-
-  // const feePayer = umi.eddsa.createKeypairFromSecretKey(
-  //   bs58.decode(process.env.PRIVATE_KEY!),
-  // )
-  // if (!feePayer) throw new Error('Fee payer not found')
-
-  // umi.use(keypairIdentity(feePayer))
-  // umi.use(mplTokenMetadata())
-
-  // const userWallet = new PublicKey(userWalletAddress)
-  // const mint = generateSigner(umi)
-
-  // const { signature } = await createProgrammableNft(umi, {
-  //   mint,
-  //   name: nftDetails.nft,
-  //   uri: nftDetails.nftMetadata,
-  //   sellerFeeBasisPoints: percentAmount(0),
-  //   creators: [
-  //     {
-  //       address: feePayer.publicKey,
-  //       share: 100,
-  //       verified: true,
-  //     },
-  //   ],
-  //   tokenOwner: userWallet as unknown as UmiPublicKey,
-  // }).sendAndConfirm(umi)
-
-  // console.log('NFT created successfully!')
-  // console.log('Mint address:', mint.publicKey)
-  // console.log('Transaction signature:', signature)
-
-  // console.log('Fetching digital asset...')
-  // const asset = await fetchDigitalAsset(umi, mint.publicKey)
-  // console.log('Digital Asset:', asset)
-
-  // return { signature }
 }
 
-// import bs58 from 'bs58'
-// ;(async () => {
-//   try {
-//     console.log('Creating Umi instance...')
-//     const umi = createUmi('http://127.0.0.1:8899')
-
-//     const keypair = umi.eddsa.createKeypairFromSecretKey(
-//       bs58.decode(
-//         '588FU4PktJWfGfxtzpAAXywSNt74AvtroVzGfKkVN1LwRuvHwKGr851uH8czM5qm4iqLbs1kKoMKtMJG4ATR7Ld2',
-//       ),
-//     )
-
-//     await umi.rpc.airdrop(keypair.publicKey, createAmount(1, 'SOL', 9))
-
-//     // Use keypairIdentity to set the keypair as the signer
-//     const signer = keypairIdentity(keypair)
-//     umi.use(signer)
-//     umi.use(mplTokenMetadata())
-
-//     console.log('Keypair loaded. Public key:', keypair.publicKey)
-
-//     console.log('Generating new mint address...')
-//     const mint = generateSigner(umi)
-
-//     console.log('Creating NFT...')
-//     const { signature } = await createNft(umi, {
-//       mint,
-//       name: 'My NFT',
-//       // Replace this with your Arweave metadata URI
-//       uri: 'https://ffaaqinzhkt4ukhbohixfliubnvpjgyedi3f2iccrq4efh3s.arweave.net/KUAIIbk6p8oo4XHRcq0U__C2r0mwQaNl0gQow4Qp9yk',
-//       sellerFeeBasisPoints: percentAmount(0),
-//       creators: [
-//         {
-//           address: keypair.publicKey,
-//           share: 100,
-//           verified: true,
-//         },
-//       ],
-//     }).sendAndConfirm(umi)
-
-//     console.log('NFT created successfully!')
-//     console.log('Mint address:', mint.publicKey)
-//     console.log('Transaction signature:', signature)
-
-//     console.log('Fetching digital asset...')
-//     const asset = await fetchDigitalAsset(umi, mint.publicKey)
-//     console.log('Digital Asset:', asset)
-//   } catch (error) {
-//     console.error('Error:', error)
-//     console.error('Stack trace:', error.stack)
+// export async function mintCertificateServerAction(userPublicKey: string) {
+//   if (!process.env.MINTER_PRIVATE_KEY || !process.env.SOLANA_RPC_ENDPOINT) {
+//     throw new Error('Missing environment variables.')
 //   }
-// })()
+
+//   const connection = new Connection(
+//     process.env.SOLANA_RPC_ENDPOINT,
+//     'confirmed',
+//   )
+//   const umi = getUmi(process.env.MINTER_PRIVATE_KEY)
+//   const minterKeypair = umi.identity.keypair // This is the authority of the Merkle tree
+
+//   const recipientPublicKey = new PublicKey(userPublicKey)
+
+//   }

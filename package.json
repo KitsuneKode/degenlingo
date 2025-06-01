@@ -20,10 +20,12 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.18.3",
+    "@metaplex-foundation/mpl-bubblegum": "^5.0.1",
     "@metaplex-foundation/mpl-token-metadata": "^3.4.0",
     "@metaplex-foundation/umi": "^1.2.0",
     "@metaplex-foundation/umi-bundle-defaults": "^1.2.0",
     "@metaplex-foundation/umi-signer-wallet-adapters": "^1.2.0",
+    "@metaplex-foundation/umi-uploader-irys": "^1.2.0",
     "@neondatabase/serverless": "^1.0.0",
     "@noble/curves": "^1.9.0",
     "@radix-ui/react-avatar": "^1.1.9",

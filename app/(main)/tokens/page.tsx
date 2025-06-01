@@ -70,6 +70,7 @@ export default async function TokensPage() {
             hasActiveSubscription={isActiveSubscription}
             unclaimedNfts={unclaimedNfts}
             activeCourseName={userProgress.activeCourse.title}
+            claimedPremiumNft={userSubscription?.subscriptionNftClaimed}
             subscriptionType={
               userSubscription?.solanaSubscriptionDetails
                 ? 'solana'
