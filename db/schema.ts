@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm'
-import { MAX_HEARTS } from '@/lib/constants'
+import { MAX_HEARTS, SIGNIN_TOKENS_AMOUNT } from '@/lib/constants'
 import {
   integer,
   pgEnum,
@@ -130,7 +130,7 @@ export const userProgress = pgTable('user_progress', {
   }),
   hearts: integer('hearts').notNull().default(MAX_HEARTS),
   points: integer('points').notNull().default(0),
-  tokens: integer('tokens').notNull().default(0),
+  tokens: integer('tokens').notNull().default(SIGNIN_TOKENS_AMOUNT),
   walletAddress: text('wallet_address'),
 })
 
