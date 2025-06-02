@@ -378,6 +378,7 @@ export const PaymentModal = () => {
                 </div>
                 <Link
                   href={`https://explorer.solana.com/tx/${transactionSignature.current}?cluster=devnet`}
+                  target="_blank"
                 >
                   <Button variant="default">View Transaction</Button>
                 </Link>

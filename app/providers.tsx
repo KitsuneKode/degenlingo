@@ -20,9 +20,9 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
       <PracticeModal />
       <PaymentModal />
       <NFTModal />
+      <Analytics />
       {children}
       <TokenModal />
-      <Analytics />
     </ClerkProvider>
   )
 }
