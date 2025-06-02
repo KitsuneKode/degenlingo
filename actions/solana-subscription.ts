@@ -6,9 +6,13 @@ import { and, eq } from 'drizzle-orm'
 import { checkWallet } from '@/lib/roles'
 import { revalidatePath } from 'next/cache'
 import { Commitment } from '@solana/web3.js'
-import { SUBSCRIPTION_DURATION } from '@/lib/constants'
+import { reduceTokens } from '@/actions/user-progress'
 import { auth, currentUser } from '@clerk/nextjs/server'
 import { solanaSubscriptionDetails, userSubscription } from '@/db/schema'
+import {
+  SUBSCRIPTION_DURATION,
+  SUBSCRIPTION_NFT_MINT_FEE_TOKEN,
+} from '@/lib/constants'
 
 export const upsertSolanaSubcription = async (
   pubKey: string,
@@ -137,4 +141,6 @@ export const upsertNftClaimed = async (
 
       throw new Error('Failed to update user subscription')
     })
+
+  await reduceTokens(SUBSCRIPTION_NFT_MINT_FEE_TOKEN)
 }
