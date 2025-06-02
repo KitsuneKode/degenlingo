@@ -1,0 +1,1 @@
+ALTER TABLE "user_subscription" RENAME COLUMN "subscription_nft_minted_at" TO "subscription_nft_asset_id";

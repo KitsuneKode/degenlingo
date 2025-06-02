@@ -159,6 +159,7 @@ export const userRedeemedNfts = pgTable('user_redeemed_nfts', {
     .notNull(),
   mintAddress: text('mint_address').notNull(),
   transactionSignature: text('transaction_signature').notNull(),
+  assetId: text('asset_id').notNull(),
   redeemedAt: timestamp('redeemed_at').defaultNow().notNull(),
 })
 
@@ -215,6 +216,10 @@ export const userSubscription = pgTable('user_subscription', {
   subscriptionNftClaimed: boolean('subscription_nft_claimed')
     .notNull()
     .default(false),
+  subscriptionNftClaimedSignature: text(
+    'subscription_nft_claimed_signature',
+  ).default(''),
+  subscriptionNftAssetId: text('subscription_nft_asset_id').default(''),
   subscriptionStatus: subscriptionStatusEnum('subscription_status')
     .notNull()
     .default('pending'),

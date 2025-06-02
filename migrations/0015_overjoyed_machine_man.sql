@@ -1,0 +1,2 @@
+ALTER TABLE "user_subscription" ALTER COLUMN "subscription_nft_claimed_signature" SET DEFAULT '';--> statement-breakpoint
+ALTER TABLE "user_subscription" ALTER COLUMN "subscription_nft_asset_id" SET DEFAULT '';

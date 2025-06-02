@@ -4,6 +4,7 @@ import db from '@/db/drizzle'
 import logger from '@/lib/logger'
 import { and, eq } from 'drizzle-orm'
 import { checkWallet } from '@/lib/roles'
+import { revalidatePath } from 'next/cache'
 import { Commitment } from '@solana/web3.js'
 import { SUBSCRIPTION_DURATION } from '@/lib/constants'
 import { auth, currentUser } from '@clerk/nextjs/server'
@@ -61,6 +62,8 @@ export const upsertSolanaSubcription = async (
           ),
         )
     })
+    revalidatePath('/tokens')
+
     return
   }
 
@@ -93,4 +96,45 @@ export const upsertSolanaSubcription = async (
       solanaTransactionStatus: status,
     })
   })
+  revalidatePath('/tokens')
+}
+
+export const upsertNftClaimed = async (
+  pubKey: string,
+  assetId: string,
+  signature: string,
+) => {
+  const { userId } = await auth()
+
+  const user = await currentUser()
+
+  if (!userId || !user) throw new Error('Unauthorized')
+
+  logger.info('User subscription nft claimed', {
+    userId,
+    pubKey,
+    assetId,
+    signature,
+  })
+  if (!assetId || !signature) throw new Error('Invalid asset id or signature')
+
+  await db
+    .update(userSubscription)
+    .set({
+      subscriptionNftClaimed: true,
+      subscriptionNftClaimedSignature: signature,
+      subscriptionNftAssetId: assetId,
+    })
+    .where(eq(userSubscription.userId, userId))
+    .catch((error) => {
+      logger.error('Failed to update user subscription:', {
+        userId,
+        pubKey,
+        assetId,
+        signature,
+        error,
+      })
+
+      throw new Error('Failed to update user subscription')
+    })
 }

@@ -369,7 +369,7 @@ export const PaymentModal = () => {
             )}
             <p className="text-lg font-medium">{statusMessage}</p>
             {status === 'completed' && (
-              <div className="flex flex-col gap-y-2">
+              <div className="flex flex-col gap-y-2 rounded-lg border border-gray-200 bg-gray-50">
                 <p className="text-md font-semibold">Transaction Signature:</p>
                 <div className="text-center text-sm font-bold">
                   <div className="text-muted-foreground max-w-md break-words">

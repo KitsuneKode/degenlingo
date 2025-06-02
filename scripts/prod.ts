@@ -41,7 +41,7 @@ const main = async () => {
             order: 1,
             nft: 'nft_1',
             nftImageSrc: '/solana.png',
-            nftMetadata: 'dasd',
+            nftMetadata: '',
           },
           {
             courseId: course.id,
@@ -50,7 +50,7 @@ const main = async () => {
             order: 2,
             nft: 'nft_2',
             nftImageSrc: '/nft.png',
-            nftMetadata: 'dasd',
+            nftMetadata: '',
           },
         ])
         .returning()

@@ -26,6 +26,10 @@ const nextConfig: NextConfig = {
     },
   ],
 
+  images: {
+    remotePatterns: [new URL('https://gateway.irys.xyz/**')],
+  },
+
   /* config options here */
 }
 

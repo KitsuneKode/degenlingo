@@ -176,7 +176,7 @@ export const claimSubscriptionNft = async (userWalletAddress: string) => {
 
     const collectionMint = publicKey(process.env.COLLECTION_MINT_ADDRESS!)
 
-    const metadataUri = process.env.SUBSCRIPTION_METADATA_URI!
+    const metadataUri = process.env.NEXT_PUBLIC_SUBSCRIPTION_METADATA_URI!
 
     const recipientPublickey = publicKey(userWalletAddress)
     const mintTxBuilder = mintToCollectionV1(umi, {
@@ -263,7 +263,8 @@ export const claimSubscriptionNft = async (userWalletAddress: string) => {
     return {
       success: true,
       transactionSignature: mintSignature,
-      assetLink: `https://explorer.solana.com/tx/${assetId.toString().split(',')[0]}?cluster=devnet`,
+      assetId: assetId.toString().split(',')[0],
+      assetLink: `https://explorer.solana.com/address/${assetId.toString().split(',')[0]}?cluster=devnet`,
       link: `https://explorer.solana.com/tx/${mintSignature}?cluster=devnet`,
     }
   } catch (error) {
@@ -318,19 +319,3 @@ export const claimNft = async (unitId: number, userWalletAddress: string) => {
 
   return nftDetails
 }
-
-// export async function mintCertificateServerAction(userPublicKey: string) {
-//   if (!process.env.MINTER_PRIVATE_KEY || !process.env.SOLANA_RPC_ENDPOINT) {
-//     throw new Error('Missing environment variables.')
-//   }
-
-//   const connection = new Connection(
-//     process.env.SOLANA_RPC_ENDPOINT,
-//     'confirmed',
-//   )
-//   const umi = getUmi(process.env.MINTER_PRIVATE_KEY)
-//   const minterKeypair = umi.identity.keypair // This is the authority of the Merkle tree
-
-//   const recipientPublicKey = new PublicKey(userPublicKey)
-
-//   }

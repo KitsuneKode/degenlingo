@@ -1,16 +1,13 @@
 'use client'
 
-import { toast } from 'sonner'
 import Image from 'next/image'
 import { units } from '@/db/schema'
-import { useTransition } from 'react'
 import { Button } from '@/components/ui/button'
 import { TOKENS_PER_NFT } from '@/lib/constants'
-import { useNFTModal } from '@/store/use-nft-modal'
 import { useTokenModal } from '@/store/use-token-modal'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { usePaymentModal } from '@/store/use-payment-modal'
-import { claimSubscriptionNft } from '../actions/redeem-tokens'
+import { NftType, useNFTModal } from '@/store/use-nft-modal'
 
 type Props = {
   tokens: number
@@ -29,51 +26,11 @@ export const TokenItems = ({
   claimedPremiumNft,
   subscriptionType,
 }: Props) => {
-  const [pending, startTransition] = useTransition()
-
-  const { publicKey: walletPublicKey, connected } = useWallet()
+  const { connected } = useWallet()
 
   const { open: openPaymentModal } = usePaymentModal()
   const { open: openTokenModal } = useTokenModal()
   const { open: openNftModal } = useNFTModal()
-
-  const onClaimNft = (nftId?: number) => {
-    if (pending) return
-
-    if (!connected || !walletPublicKey) {
-      toast.error('Please connect your wallet first')
-      return
-    }
-
-    if (!hasActiveSubscription && tokens < TOKENS_PER_NFT) {
-      toast.error(
-        `Not enough tokens to claim NFT. Need ${TOKENS_PER_NFT} tokens or upgrade to premium.`,
-      )
-      return
-    }
-
-    startTransition(async () => {
-      try {
-        // ✅ First check server-side validation and update database
-        if (!nftId) {
-          const transaction = await claimSubscriptionNft(
-            walletPublicKey.toBase58(),
-          )
-
-          if (transaction.error || !transaction.success) {
-            throw new Error(transaction.error || 'Failed to claim NFT')
-          }
-
-          toast.success('NFT claimed successfully!')
-        } else {
-          toast.success('UNIT NFT coming soon!')
-        }
-      } catch (error) {
-        console.error('Failed to claim NFT:', error)
-        toast.error('Failed to claim NFT. Please try again.')
-      }
-    })
-  }
 
   if (!connected) {
     return (
@@ -110,9 +67,7 @@ export const TokenItems = ({
               ? 'secondary'
               : 'default'
           }
-          disabled={
-            pending || (subscriptionType === 'solana' && hasActiveSubscription)
-          }
+          disabled={subscriptionType === 'solana' && hasActiveSubscription}
           onClick={openPaymentModal}
         >
           {hasActiveSubscription
@@ -136,23 +91,7 @@ export const TokenItems = ({
           </p>
           <p className="text-sm text-neutral-500">Get them in your wallet</p>
         </div>
-        <Button
-          variant={
-            subscriptionType === 'solana' && hasActiveSubscription
-              ? 'secondary'
-              : 'default'
-          }
-          disabled={
-            pending || (subscriptionType === 'solana' && hasActiveSubscription)
-          }
-          onClick={openPaymentModal}
-        >
-          {hasActiveSubscription
-            ? subscriptionType === 'stripe'
-              ? 'settings'
-              : 'premium active'
-            : 'upgrade'}
-        </Button>
+        <Button onClick={() => openTokenModal(tokens)}>redeem tokens</Button>
       </div>
 
       {/* NFT Claims Section */}
@@ -177,15 +116,17 @@ export const TokenItems = ({
           </div>
           <Button
             variant={claimedPremiumNft ? 'primary' : 'default'}
-            disabled={
-              pending ||
-              (!hasActiveSubscription && tokens < TOKENS_PER_NFT) ||
-              claimedPremiumNft
+            disabled={claimedPremiumNft}
+            onClick={() =>
+              openNftModal(
+                NftType.subscription,
+                undefined,
+                process.env.NEXT_PUBLIC_SUBSCRIPTION_METADATA_URI,
+              )
             }
-            onClick={() => onClaimNft()}
             className="min-w-[100px]"
           >
-            {pending ? 'Minting...' : claimedPremiumNft ? 'Claimed' : 'Claim'}
+            {claimedPremiumNft ? 'Claimed' : 'Claim'}
           </Button>
         </div>
       )}
@@ -218,63 +159,18 @@ export const TokenItems = ({
               </p>
             </div>
             <Button
-              disabled={
-                pending || (!hasActiveSubscription && tokens < TOKENS_PER_NFT)
+              onClick={() =>
+                openNftModal(NftType.unit, nft.id, nft.nftMetadata)
               }
-              onClick={() => onClaimNft(nft.id)}
               className="min-w-[100px]"
             >
-              {pending
-                ? 'Minting...'
-                : hasActiveSubscription
-                  ? 'Claim Free'
-                  : `${TOKENS_PER_NFT} tokens`}
+              {hasActiveSubscription
+                ? 'Claim Free'
+                : `${TOKENS_PER_NFT} tokens`}
             </Button>
           </div>
         ))
       )}
-
-      {/* Wallet Info */}
-      <div className="rounded-b-lg border-t-2 bg-neutral-50 p-4">
-        <div className="flex justify-between text-sm text-neutral-600">
-          <span>Connected Wallet:</span>
-          <span className="font-mono">
-            {walletPublicKey?.toBase58().slice(0, 8)}...
-            {walletPublicKey?.toBase58().slice(-8)}
-          </span>
-        </div>
-        <div className="mt-1 flex justify-between text-sm text-neutral-600">
-          <span>Your Tokens:</span>
-          <span className="font-bold">{tokens}</span>
-        </div>
-
-        <Button
-          variant="default"
-          disabled={pending}
-          onClick={openPaymentModal}
-          className="w-full"
-        >
-          Upgrade to Premium
-        </Button>
-        <Button
-          variant="default"
-          disabled={pending}
-          onClick={() => openTokenModal(tokens)}
-          className="w-full"
-        >
-          Redeem Tokens
-        </Button>
-        <Button
-          variant="default"
-          disabled={pending}
-          onClick={() =>
-            openNftModal('/icon.jpeg', 'Premium', 'Degenlingo Premium')
-          }
-          className="w-full"
-        >
-          NFT Claim
-        </Button>
-      </div>
     </ul>
   )
 }

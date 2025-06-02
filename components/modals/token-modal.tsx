@@ -340,13 +340,16 @@ export const TokenModal = () => {
                     </svg>
                   </div>
                   <p className="text-lg font-medium">{statusMessage}</p>
+
                   <div className="flex flex-col gap-y-2">
-                    <p className="text-md font-semibold">
-                      Transaction Signature:
-                    </p>
-                    <div className="text-center text-sm font-bold">
-                      <div className="text-muted-foreground max-w-md break-words">
-                        {transactionSignature.current}
+                    <div className="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
+                      <p className="text-md font-semibold">
+                        Transaction Signature:
+                      </p>
+                      <div className="text-center text-sm font-bold">
+                        <div className="text-muted-foreground max-w-[400px] break-words">
+                          {transactionSignature.current}
+                        </div>
                       </div>
                     </div>
                     <Link

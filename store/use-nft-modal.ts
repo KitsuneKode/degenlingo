@@ -2,28 +2,23 @@ import { create } from 'zustand'
 
 type NFTModalState = {
   isOpen: boolean
-  nftImage: string
-  nftName: string
-  nftDescription?: string
-  transactionSignature: string
-  stage: 'preview' | 'minting' | 'result'
-  open: (nftImage: string, nftName: string, nftDescription?: string) => void
-  setTransactionSignature: (signature: string) => void
-  setStage: (stage: 'preview' | 'minting' | 'result') => void
+  nftType: NftType
+  unitId?: number
+  metadataUri?: string
+  open: (nftType: NftType, unitId?: number, metadataUri?: string) => void
   close: () => void
 }
 
+export enum NftType {
+  subscription,
+  unit,
+}
 export const useNFTModal = create<NFTModalState>((set) => ({
   isOpen: false,
-  nftImage: '',
-  nftName: '',
-  nftDescription: '',
-  transactionSignature: '',
-  stage: 'preview',
-  open: (nftImage, nftName, nftDescription) =>
-    set({ isOpen: true, nftImage, nftName, nftDescription, stage: 'preview' }),
-  setTransactionSignature: (transactionSignature) =>
-    set({ transactionSignature }),
-  setStage: (stage) => set({ stage }),
+  nftType: NftType.subscription,
+  unitId: undefined,
+  metadataUri: undefined,
+  open: (nftType: NftType, unitId?: number, metadataUri?: string) =>
+    set({ isOpen: true, nftType, unitId, metadataUri }),
   close: () => set({ isOpen: false }),
 }))
